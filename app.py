@@ -54,7 +54,7 @@ def display_header():
 def display_sidebar_filters(df):
     st.sidebar.header("Filter Data")
 
-    # Date-related columns
+    # Add date-related columns
     df['Year'] = df['Date'].dt.year
     df['Month_Name'] = df['Date'].dt.month_name()
     df['Quarter'] = df['Date'].dt.quarter
@@ -64,7 +64,7 @@ def display_sidebar_filters(df):
     quarter_filter = st.sidebar.selectbox("Select Quarter", ['All', 'Q1', 'Q2', 'Q3', 'Q4'])
     month_filter = st.sidebar.selectbox("Select Month", ['All'] + list(df['Month_Name'].unique()))
 
-    # Start with year filter
+    # Apply year filter
     filtered_df = df[df['Year'] == year_filter]
 
     # Apply quarter filter
@@ -77,12 +77,9 @@ def display_sidebar_filters(df):
         filtered_df = filtered_df[filtered_df['Month_Name'] == month_filter]
 
     return filtered_df
-    
-    # Month filter
-    if month_filter != 'All':
-        filtered_df = filtered_df[filtered_df['Date'].dt.month_name() == month_filter]
-    
-    return filtered_df
+
+# Call the function with your DataFrame
+filtered_df = display_sidebar_filters(df)
 
 # Create main tabs for different dashboards
 tab1, tab2, tab3, tab4, tab5 = st.tabs([
@@ -92,10 +89,6 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "Relationship Explorer", 
     "Key Insights & Highlights"
 ])
-
-# Get filtered data
-filtered_df = display_sidebar_filters()
-
 # DASHBOARD 1: MONEY SUPPLY OVERVIEW
 with tab1:
     display_header()
