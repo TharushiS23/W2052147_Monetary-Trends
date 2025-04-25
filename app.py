@@ -51,21 +51,32 @@ def display_header():
         st.write(f"Last updated by:  \n {box_date}")
 
 # Common sidebar filters for all dashboards
-def display_sidebar_filters():
+def display_sidebar_filters(df):
     st.sidebar.header("Filter Data")
-    end_date = st.sidebar.date_input("End Date", df['Date'].max())
+
+    # Date-related columns
+    df['Year'] = df['Date'].dt.year
+    df['Month_Name'] = df['Date'].dt.month_name()
+    df['Quarter'] = df['Date'].dt.quarter
+
+    # Sidebar filters
     year_filter = st.sidebar.selectbox("Select Year", sorted(df['Year'].unique()))
     quarter_filter = st.sidebar.selectbox("Select Quarter", ['All', 'Q1', 'Q2', 'Q3', 'Q4'])
-    month_filter = st.sidebar.selectbox("Select Month", ['All'] + list(df['Date'].dt.month_name().unique()))
-    
-    # Filter the data based on the selected inputs
-    filtered_df = (df['Date'] <= pd.to_datetime(end_date))
-    filtered_df = filtered_df[filtered_df['Year'] == year_filter]
-    
-    # Quarter filter
+    month_filter = st.sidebar.selectbox("Select Month", ['All'] + list(df['Month_Name'].unique()))
+
+    # Start with year filter
+    filtered_df = df[df['Year'] == year_filter]
+
+    # Apply quarter filter
     if quarter_filter != 'All':
         q_map = {'Q1': 1, 'Q2': 2, 'Q3': 3, 'Q4': 4}
-        filtered_df = filtered_df[filtered_df['Date'].dt.quarter == q_map[quarter_filter]]
+        filtered_df = filtered_df[filtered_df['Quarter'] == q_map[quarter_filter]]
+
+    # Apply month filter
+    if month_filter != 'All':
+        filtered_df = filtered_df[filtered_df['Month_Name'] == month_filter]
+
+    return filtered_df
     
     # Month filter
     if month_filter != 'All':
