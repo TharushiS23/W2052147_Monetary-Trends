@@ -131,9 +131,11 @@ with tab1:
     
     # Growth rate line chart: YoY % change in M1, M2, M3
     st.subheader("Year-over-Year Growth Rates")
+
+    df_temp = filtered_df.copy()
+    df_temp = df_temp.sort_values("Date")
     
     # Calculating YoY growth rates
-    df_temp = filtered_df.copy()
     df_temp['M0_Growth'] = df_temp["Reserve Money (M0)  (a)"].pct_change(periods=12) * 100
     df_temp['M1_Growth'] = df_temp["Narrow Money (M1) \n(c)    \n (1) + (2)"].pct_change(periods=12) * 100
     df_temp['M2_Growth'] = df_temp["Broad Money (M2) (b)"].pct_change(periods=12) * 100
@@ -159,12 +161,13 @@ with tab1:
     # Summing up the latest available data for the components
     latest_data = filtered_df.iloc[-1]  # Get the latest row of data
     money_supply = [
+        latest_data["Reserve Money (M0)  (a)"],
         latest_data["Narrow Money (M1) \n(c)    \n (1) + (2)"],
         latest_data["Broad Money (M2) (b)"],
         latest_data["Broad Money (M2b) \n(d)            \n (3) + (4)"]
     ]
     
-    labels = ['M1', 'M2', 'M2b']
+    labels = ['M0','M1', 'M2', 'M2b']
     
     fig4 = go.Figure(data=[go.Pie(labels=labels, values=money_supply, hole=0.3)])
     
