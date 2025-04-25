@@ -53,14 +53,13 @@ def display_header():
 # Common sidebar filters for all dashboards
 def display_sidebar_filters():
     st.sidebar.header("Filter Data")
-    start_date = st.sidebar.date_input("Start Date", df['Date'].min())
     end_date = st.sidebar.date_input("End Date", df['Date'].max())
     year_filter = st.sidebar.selectbox("Select Year", sorted(df['Year'].unique()))
     quarter_filter = st.sidebar.selectbox("Select Quarter", ['All', 'Q1', 'Q2', 'Q3', 'Q4'])
     month_filter = st.sidebar.selectbox("Select Month", ['All'] + list(df['Date'].dt.month_name().unique()))
     
     # Filter the data based on the selected inputs
-    filtered_df = df[(df['Date'] >= pd.to_datetime(start_date)) & (df['Date'] <= pd.to_datetime(end_date))]
+    filtered_df = (df['Date'] <= pd.to_datetime(end_date))
     filtered_df = filtered_df[filtered_df['Year'] == year_filter]
     
     # Quarter filter
