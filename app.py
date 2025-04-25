@@ -129,32 +129,7 @@ with tab1:
         )
         st.plotly_chart(fig2, use_container_width=True)
     
-    # Growth rate line chart: YoY % change in M1, M2, M3
-    st.subheader("Year-over-Year Growth Rates")
 
-    df_temp = filtered_df.copy()
-    df_temp = df_temp.sort_values("Date")
-    
-    # Calculating YoY growth rates
-    df_temp['M0_Growth'] = df_temp["Reserve Money (M0)  (a)"].pct_change(periods=12) * 100
-    df_temp['M1_Growth'] = df_temp["Narrow Money (M1) \n(c)    \n (1) + (2)"].pct_change(periods=12) * 100
-    df_temp['M2_Growth'] = df_temp["Broad Money (M2) (b)"].pct_change(periods=12) * 100
-    df_temp['M2b_Growth'] = df_temp["Broad Money (M2b) \n(d)            \n (3) + (4)"].pct_change(periods=12) * 100
-    
-    fig3 = go.Figure()
-    fig3.add_trace(go.Scatter(x=df_temp["Date"], y=df_temp["M0_Growth"], mode='lines', name='M0 Growth %'))
-    fig3.add_trace(go.Scatter(x=df_temp["Date"], y=df_temp["M1_Growth"], mode='lines', name='M1 Growth %'))
-    fig3.add_trace(go.Scatter(x=df_temp["Date"], y=df_temp["M2_Growth"], mode='lines', name='M2 Growth %'))
-    fig3.add_trace(go.Scatter(x=df_temp["Date"], y=df_temp["M2b_Growth"], mode='lines', name='M2b Growth %'))
-    
-    fig3.update_layout(
-        title='YoY % Change in Money Supply Components',
-        xaxis_title='Date',
-        yaxis_title='Growth Rate (%)',
-        legend_title='Money Supply Types'
-    )
-    st.plotly_chart(fig3, use_container_width=True)
-    
     # Add a pie chart to the dashboard
     st.subheader("Distribution of Money Supply Components (Pie Chart)")
     
