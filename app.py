@@ -4,9 +4,8 @@ import datetime
 from PIL import Image
 import plotly.graph_objects as go
 import numpy as np
+import plotly as px
 from plotly.subplots import make_subplots
-
-
 
 # Load the dataset
 @st.cache_data
@@ -17,7 +16,6 @@ def load_data():
     df['Date'] = pd.to_datetime(df['Date'], errors='coerce').dt.normalize()
     # Extract year and use it for the filter
     df['Year'] = df['Date'].dt.year
-
     df['Total'] = df["Broad Money (M2b) \n(d)            \n (3) + (4)"]
     return df
 
@@ -63,7 +61,7 @@ def display_header():
     with col2:
         st.markdown(html_title, unsafe_allow_html=True)
     
-    col3, _, _ = st.columns([0.1, 0.45, 0.45])
+    col1, col2, col3 = st.columns([0.2, 0.8, 0.1])
     with col3:
         # Display last updated date
         box_date = str(datetime.datetime.now().strftime("%d %B %Y"))
@@ -72,30 +70,24 @@ def display_header():
 # Common sidebar filters for all dashboards
 def display_sidebar_filters(df):
     st.sidebar.header("Filter Data")
-
     # Add date-related columns
     df['Date'] = pd.to_datetime(df['Date'])
     df['Year'] = df['Date'].dt.year
     df['Month_Name'] = df['Date'].dt.month_name()
     df['Quarter'] = df['Date'].dt.quarter
-
     # Sidebar filters
     year_filter = st.sidebar.selectbox("Select Year", sorted(df['Year'].unique()))
     quarter_filter = st.sidebar.selectbox("Select Quarter", ['All', 'Q1', 'Q2', 'Q3', 'Q4'])
     month_filter = st.sidebar.selectbox("Select Month", ['All'] + list(df['Month_Name'].unique()))
-
     # Apply year filter
     filtered_df = df[df['Year'] == year_filter]
-
     # Apply quarter filter
     if quarter_filter != 'All':
         q_map = {'Q1': 1, 'Q2': 2, 'Q3': 3, 'Q4': 4}
         filtered_df = filtered_df[filtered_df['Quarter'] == q_map[quarter_filter]]
-
     # Apply month filter
     if month_filter != 'All':
         filtered_df = filtered_df[filtered_df['Month_Name'] == month_filter]
-
     return filtered_df
 
 filtered_df = display_sidebar_filters(df)
@@ -108,6 +100,7 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "Relationship Explorer", 
     "Key Insights & Highlights"
 ])
+
 # DASHBOARD 1: MONEY SUPPLY OVERVIEW
 with tab1:
     display_header()
@@ -148,7 +141,6 @@ with tab1:
         )
         st.plotly_chart(fig2, use_container_width=True)
     
-
     # Add a pie chart to the dashboard
     st.subheader("Distribution of Money Supply Components (%)")
     
@@ -169,9 +161,7 @@ with tab1:
         title='Pie Chart of Money Supply Components',
         legend_title='Money Supply Types'
     )
-
     st.plotly_chart(fig4, use_container_width=True)
-
     st.subheader("Yearly Summary of Money Supply Components")
     
     # Group data by year and calculate the total sum for each component
@@ -181,7 +171,6 @@ with tab1:
         "Broad Money (M2) (b)": "sum",
         "Broad Money (M2b) \n(d)            \n (3) + (4)": "sum"
     }).reset_index()
-
     yearly_summary.rename(columns={
         "Date": "Year",
         "Reserve Money (M0)  (a)": "M0",
@@ -189,7 +178,6 @@ with tab1:
         "Broad Money (M2) (b)": "M2",
         "Broad Money (M2b) \n(d)            \n (3) + (4)": "M2b"
     }, inplace=True)
-
     st.dataframe(yearly_summary, use_container_width=True)
     
     with st.expander("View Raw Data"):
@@ -202,7 +190,6 @@ with tab2:
     st.header("Credit Availability Trends")
     
     col1, col2 = st.columns(2)
-
     with col1:
         # Dual-axis chart: M2 vs Private Sector Credit
         fig5 = make_subplots(specs=[[{"secondary_y": True}]])
@@ -228,153 +215,141 @@ with tab2:
         st.plotly_chart(fig5, use_container_width=True)
     
     with col2:
-       # Line chart:credit columns
-     credit_columns = {
-    "Net Credit granted to the Government by Central Bank": "Govt Credit by Central Bank",
-    "Net Credit granted to the Government by Commercial Banks": "Govt Credit by Commercial Banks",
-    "Net Credit granted to the Government (NCG)\n(8) + (9)": "Total Govt Credit (NCG)",
-    "Credit granted to Public Corporations by Commercial Banks": "Credit to Public Corporations",
-    "Credit granted to the Private Sector by Commercial Banks": "Credit to Private Sector",
-    "Domestic Credit \n(10) + (11) + (12)": "Total Domestic Credit"
-}
-
-fig4 = go.Figure()
-for old_col, new_col in credit_columns.items():
-    fig4.add_trace(go.Scatter(x=filtered_df["Date"], y=filtered_df[old_col], mode='lines', name=new_col))
-
-fig4.update_layout(
-    title='Credit Growth Over Time',
-    xaxis_title='Date',
-    yaxis_title='Credit Amount (Rs. Mn)',
-    legend_title='Credit Types'
-)
-st.plotly_chart(fig4, use_container_width=True)
-
-import plotly.graph_objects as go
-import streamlit as st
-
-# Assuming you already have the filtered_df DataFrame
-# Define the credit-related columns and money supply columns
-credit_columns = [
-    "Net Credit granted to the Government by Central Bank", 
-    "Net Credit granted to the Government by Commercial Banks",
-    "Net Credit granted to the Government (NCG)\n(8) + (9)",
-    "Credit granted to Public Corporations by Commercial Banks",
-    "Credit granted to the Private Sector by Commercial Banks",
-    "Domestic Credit \n(10) + (11) + (12)"
-]
-
-money_supply_columns = [
-    "Narrow Money (M1) \n(c)    \n (1) + (2)", 
-    "Broad Money (M2) (b)", 
-    "Broad Money (M2b) \n(d)            \n (3) + (4)"
-]
-
-# Combine both sets of columns to compute the correlation matrix
-all_columns = credit_columns + money_supply_columns
-corr_df = filtered_df[all_columns].corr()
-
-# Create a heatmap using go.Heatmap
-corr_z = corr_df.values
-
-fig6 = go.Figure(data=go.Heatmap(
+        # Line chart:credit columns
+        credit_columns = {
+            "Net Credit granted to the Government by Central Bank": "Govt Credit by Central Bank",
+            "Net Credit granted to the Government by Commercial Banks": "Govt Credit by Commercial Banks",
+            "Net Credit granted to the Government (NCG)\n(8) + (9)": "Total Govt Credit (NCG)",
+            "Credit granted to Public Corporations by Commercial Banks": "Credit to Public Corporations",
+            "Credit granted to the Private Sector by Commercial Banks": "Credit to Private Sector",
+            "Domestic Credit \n(10) + (11) + (12)": "Total Domestic Credit"
+        }
+        fig4 = go.Figure()
+        for old_col, new_col in credit_columns.items():
+            fig4.add_trace(go.Scatter(x=filtered_df["Date"], y=filtered_df[old_col], mode='lines', name=new_col))
+        fig4.update_layout(
+            title='Credit Growth Over Time',
+            xaxis_title='Date',
+            yaxis_title='Credit Amount (Rs. Mn)',
+            legend_title='Credit Types'
+        )
+        st.plotly_chart(fig4, use_container_width=True)
+    
+    # Define the credit-related columns and money supply columns with short names
+    credit_columns = {
+        "Net Credit granted to the Government by Central Bank": "Govt Credit by Central Bank",
+        "Net Credit granted to the Government by Commercial Banks": "Govt Credit by Commercial Banks",
+        "Net Credit granted to the Government (NCG)\n(8) + (9)": "Total Govt Credit (NCG)",
+        "Credit granted to Public Corporations by Commercial Banks": "Credit to Public Corporations",
+        "Credit granted to the Private Sector by Commercial Banks": "Credit to Private Sector",
+        "Domestic Credit \n(10) + (11) + (12)": "Total Domestic Credit"
+    }
+    money_supply_columns = {
+        "Narrow Money (M1) \n(c)    \n (1) + (2)": "Narrow Money (M1)",
+        "Broad Money (M2) (b)": "Broad Money (M2)",
+        "Broad Money (M2b) \n(d)            \n (3) + (4)": "Broad Money (M2b)"
+    }
+    # Merge both dictionaries
+    all_columns = {**credit_columns, **money_supply_columns}
+    # Select only the original columns (keys)
+    selected_df = filtered_df[list(all_columns.keys())]
+    # Rename the selected columns to their short names (values)
+    selected_df = selected_df.rename(columns=all_columns)
+    # Now calculate the correlation matrix
+    corr_df = selected_df.corr()
+    # Create a heatmap using go.Heatmap
+    corr_z = corr_df.values
+    fig6 = go.Figure(data=go.Heatmap(
         z=corr_z,
         x=corr_df.columns,
         y=corr_df.columns,
         colorscale='RdBu_r',
-        zmin=-1, zmax=1
+        zmin=-1,
+        zmax=1
     ))
-
-# Add annotations (correlation values)
-for i, row in enumerate(corr_z):
-    for j, val in enumerate(row):
-        fig6.add_annotation(
-            x=corr_df.columns[j],  # x position for annotation (column name)
-            y=corr_df.columns[i],  # y position for annotation (row name)
-            text=f"{val:.2f}",  # Display the correlation value rounded to two decimal places
-            showarrow=False,  # No arrow needed, just the value
-            font=dict(color="white" if abs(val) > 0.5 else "black")  # Font color based on correlation strength
-        )
-
-# Update layout with title
-fig6.update_layout(
+    # Add annotations (correlation values)
+    for i, row in enumerate(corr_z):
+        for j, val in enumerate(row):
+            fig6.add_annotation(
+                x=corr_df.columns[j],
+                y=corr_df.columns[i],
+                text=f"{val:.2f}",
+                showarrow=False,
+                font=dict(color="white" if abs(val) > 0.5 else "black")
+            )
+    # Update layout with title
+    fig6.update_layout(
         title="Correlation Between Credit and Money Supply Variables"
     )
-
-# Display the heatmap in Streamlit
-st.subheader("Correlation Matrix: Credit Variables vs Money Supply")
-st.plotly_chart(fig6, use_container_width=True)
-
+    # Display in Streamlit
+    st.subheader("Correlation Matrix: Credit Variables vs Money Supply")
+    st.plotly_chart(fig6, use_container_width=True)
 
 # DASHBOARD 3: ECONOMIC LIQUIDITY INDICATORS
 with tab3:
     display_header()
     st.header("Economic Liquidity Indicators")
     
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        # Line chart: Interest rates, reserve money, inflation
-        # Replace with actual column names from your dataset
-        # For demonstration, we'll create random data
-        filtered_df['Interest_Rate'] = np.random.uniform(5, 15, size=len(filtered_df))
-        filtered_df['Reserve_Money'] = filtered_df["Narrow Money (M1) \n(c)    \n (1) + (2)"] * 0.3  # Just for demo
-        filtered_df['Inflation'] = np.random.uniform(2, 10, size=len(filtered_df))
-        
-        fig7 = go.Figure()
-        fig7.add_trace(go.Scatter(x=filtered_df["Date"], y=filtered_df["Interest_Rate"], mode='lines', name='Interest Rate (%)'))
-        fig7.add_trace(go.Scatter(x=filtered_df["Date"], y=filtered_df["Reserve_Money"], mode='lines', name='Reserve Money (Rs. Mn)'))
-        fig7.add_trace(go.Scatter(x=filtered_df["Date"], y=filtered_df["Inflation"], mode='lines', name='Inflation (%)'))
-        
-        fig7.update_layout(
-            title='Key Liquidity Indicators',
-            xaxis_title='Date',
-            yaxis_title='Value',
-            legend_title='Indicators'
-        )
-        st.plotly_chart(fig7, use_container_width=True)
-    
-    with col2:
-        # Dual-axis: Reserve money vs Inflation or Interest Rate
-        fig8 = make_subplots(specs=[[{"secondary_y": True}]])
-        
-        fig8.add_trace(
-            go.Scatter(x=filtered_df["Date"], y=filtered_df["Reserve_Money"], name="Reserve Money"),
-            secondary_y=False,
-        )
-        
-        fig8.add_trace(
-            go.Scatter(x=filtered_df["Date"], y=filtered_df["Inflation"], name="Inflation Rate"),
-            secondary_y=True,
-        )
-        
-        fig8.update_layout(
-            title_text="Reserve Money vs Inflation",
-            xaxis_title="Date"
-        )
-        
-        fig8.update_yaxes(title_text="Reserve Money (Rs. Mn)", secondary_y=False)
-        fig8.update_yaxes(title_text="Inflation Rate (%)", secondary_y=True)
-        
-        st.plotly_chart(fig8, use_container_width=True)
-    
-    # YoY % change plots: For liquidity-related variables
-    st.subheader("Year-over-Year Changes in Liquidity Indicators")
-    
-    # Calculate YoY changes (placeholder calculations)
-    filtered_df['Reserve_Money_Growth'] = filtered_df["Reserve_Money"].pct_change(periods=12) * 100
-    
-    fig9 = go.Figure()
-    fig9.add_trace(go.Scatter(x=filtered_df["Date"], y=filtered_df["Reserve_Money_Growth"], mode='lines', name='Reserve Money Growth (%)'))
-    fig9.add_trace(go.Scatter(x=filtered_df["Date"], y=filtered_df["Inflation"], mode='lines', name='Inflation Rate (%)'))
-    
-    fig9.update_layout(
-        title='YoY % Change in Liquidity Indicators',
-        xaxis_title='Date',
-        yaxis_title='Growth Rate (%)',
-        legend_title='Indicators'
+    # Set up columns layout
+col1, col2 = st.columns(2)
+
+with col1:
+    # Bubble Chart: Money Supply vs GDP
+    fig7 = px.scatter(
+        filtered_df,
+        x="Broad Money (M2b) (Rs.Mn)", 
+        y="GDP at Current Market Prices (Rs.Mn)",
+        size="Narrow Money (M1) \n(c)    \n (1) + (2)",
+        color="Broad Money (M2) (Rs.Mn)", 
+        hover_name="Date",
+        title="Money Supply vs GDP (Bubble Chart)"
     )
-    st.plotly_chart(fig9, use_container_width=True)
+    fig7.update_layout(
+        xaxis_title="Broad Money (M2b) (Rs. Mn)",
+        yaxis_title="GDP at Current Market Prices (Rs. Mn)"
+    )
+    st.plotly_chart(fig7, use_container_width=True)
+
+with col2:
+    # Violin Plot: Distribution of Credit Types
+    fig8 = px.violin(
+        filtered_df.melt(
+            id_vars=["Date"], 
+            value_vars=[
+                "Credit to Government (Net) (Rs.Mn)", 
+                "Credit to Public Corporations (Net) (Rs.Mn)",
+                "Credit to the Private Sector (Rs.Mn)"
+            ],
+            var_name="Credit Type",
+            value_name="Amount (Rs.Mn)"
+        ),
+        x="Credit Type",
+        y="Amount (Rs.Mn)",
+        box=True,
+        points="all",
+        title="Distribution of Credit Types"
+    )
+    st.plotly_chart(fig8, use_container_width=True)
+
+# Full width for Scatter Matrix
+st.subheader("Correlation of Money Supply Components Over Time")
+
+fig9 = px.scatter_matrix(
+    filtered_df,
+    dimensions=[
+        "Narrow Money (M1) \n(c)    \n (1) + (2)",
+        "Broad Money (M2) (Rs.Mn)",
+        "Broad Money (M2b) (Rs.Mn)"
+    ],
+    color="Year",  # Assuming you have a 'Year' column
+    title="Scatter Matrix of Money Supply Components"
+)
+fig9.update_layout(
+    dragmode='select',
+    width=900,
+    height=800
+)
+st.plotly_chart(fig9, use_container_width=True)
 
 # DASHBOARD 4: RELATIONSHIP EXPLORER
 with tab4:
