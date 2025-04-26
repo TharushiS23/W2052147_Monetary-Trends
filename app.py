@@ -182,7 +182,6 @@ with tab1:
         "Broad Money (M2b) \n(d)            \n (3) + (4)": "sum"
     }).reset_index()
 
-    # Rename columns for better display
     yearly_summary.rename(columns={
         "Date": "Year",
         "Reserve Money (M0)  (a)": "M0",
@@ -206,7 +205,14 @@ with tab2:
     
     with col1:
         # Line chart: Private sector credit, total domestic credit over time
-        credit_columns = ["Net Credit granted to the Government by Central Bank", "Net Credit granted to the Government by Commercial Banks","Net Credit granted to the Government (NCG)\n(8) + (9)","Credit granted to Public Corporations by Commercial Banks","Credit granted to the Private Sector by Commercial Banks","Domestic Credit \n(10) + (11) + (12)"]  # Replace with actual credit columns
+        credit_columns = {
+    "Net Credit granted to the Government by Central Bank": "Govt Credit by Central Bank",
+    "Net Credit granted to the Government by Commercial Banks": "Govt Credit by Commercial Banks",
+    "Net Credit granted to the Government (NCG)\n(8) + (9)": "Total Govt Credit (NCG)",
+    "Credit granted to Public Corporations by Commercial Banks": "Credit to Public Corporations",
+    "Credit granted to the Private Sector by Commercial Banks": "Credit to Private Sector",
+    "Domestic Credit \n(10) + (11) + (12)": "Total Domestic Credit"
+}
         
         fig4 = go.Figure()
         for col in credit_columns:
