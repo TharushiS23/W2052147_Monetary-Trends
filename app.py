@@ -202,31 +202,8 @@ with tab2:
     st.header("Credit Availability Trends")
     
     col1, col2 = st.columns(2)
-    
+
     with col1:
-        # Line chart: Private sector credit, total domestic credit over time
-        credit_columns = {
-    "Net Credit granted to the Government by Central Bank": "Govt Credit by Central Bank",
-    "Net Credit granted to the Government by Commercial Banks": "Govt Credit by Commercial Banks",
-    "Net Credit granted to the Government (NCG)\n(8) + (9)": "Total Govt Credit (NCG)",
-    "Credit granted to Public Corporations by Commercial Banks": "Credit to Public Corporations",
-    "Credit granted to the Private Sector by Commercial Banks": "Credit to Private Sector",
-    "Domestic Credit \n(10) + (11) + (12)": "Total Domestic Credit"
-}
-        
-        fig4 = go.Figure()
-        for col in credit_columns:
-            fig4.add_trace(go.Scatter(x=filtered_df["Date"], y=filtered_df[col], mode='lines', name=col))
-        
-        fig4.update_layout(
-            title='Credit Growth Over Time',
-            xaxis_title='Date',
-            yaxis_title='Credit Amount (Rs. Mn)',
-            legend_title='Credit Types'
-        )
-        st.plotly_chart(fig4, use_container_width=True)
-    
-    with col2:
         # Dual-axis chart: M2 vs Private Sector Credit
         fig5 = make_subplots(specs=[[{"secondary_y": True}]])
         
@@ -250,41 +227,84 @@ with tab2:
         
         st.plotly_chart(fig5, use_container_width=True)
     
-    # Correlation matrix using heatmap without px
-    st.subheader("Correlation Matrix: Credit Variables vs Money Supply")
-    
-    # For demonstration we'll create a correlation matrix with available columns
-    # Replace with actual credit-related columns
-    corr_columns = ["Narrow Money (M1) \n(c)    \n (1) + (2)", "Broad Money (M2) (b)", "Broad Money (M2b) \n(d)            \n (3) + (4)"]
-    corr_df = filtered_df[corr_columns].corr()
-    
-    # Create a heatmap using go.Heatmap instead of px.imshow
-    corr_z = corr_df.values
-    
-    fig6 = go.Figure(data=go.Heatmap(
+    with col2:
+       # Line chart:credit columns
+     credit_columns = {
+    "Net Credit granted to the Government by Central Bank": "Govt Credit by Central Bank",
+    "Net Credit granted to the Government by Commercial Banks": "Govt Credit by Commercial Banks",
+    "Net Credit granted to the Government (NCG)\n(8) + (9)": "Total Govt Credit (NCG)",
+    "Credit granted to Public Corporations by Commercial Banks": "Credit to Public Corporations",
+    "Credit granted to the Private Sector by Commercial Banks": "Credit to Private Sector",
+    "Domestic Credit \n(10) + (11) + (12)": "Total Domestic Credit"
+}
+
+fig4 = go.Figure()
+for old_col, new_col in credit_columns.items():
+    fig4.add_trace(go.Scatter(x=filtered_df["Date"], y=filtered_df[old_col], mode='lines', name=new_col))
+
+fig4.update_layout(
+    title='Credit Growth Over Time',
+    xaxis_title='Date',
+    yaxis_title='Credit Amount (Rs. Mn)',
+    legend_title='Credit Types'
+)
+st.plotly_chart(fig4, use_container_width=True)
+
+import plotly.graph_objects as go
+import streamlit as st
+
+# Assuming you already have the filtered_df DataFrame
+# Define the credit-related columns and money supply columns
+credit_columns = [
+    "Net Credit granted to the Government by Central Bank", 
+    "Net Credit granted to the Government by Commercial Banks",
+    "Net Credit granted to the Government (NCG)\n(8) + (9)",
+    "Credit granted to Public Corporations by Commercial Banks",
+    "Credit granted to the Private Sector by Commercial Banks",
+    "Domestic Credit \n(10) + (11) + (12)"
+]
+
+money_supply_columns = [
+    "Narrow Money (M1) \n(c)    \n (1) + (2)", 
+    "Broad Money (M2) (b)", 
+    "Broad Money (M2b) \n(d)            \n (3) + (4)"
+]
+
+# Combine both sets of columns to compute the correlation matrix
+all_columns = credit_columns + money_supply_columns
+corr_df = filtered_df[all_columns].corr()
+
+# Create a heatmap using go.Heatmap
+corr_z = corr_df.values
+
+fig6 = go.Figure(data=go.Heatmap(
         z=corr_z,
         x=corr_df.columns,
         y=corr_df.columns,
         colorscale='RdBu_r',
         zmin=-1, zmax=1
     ))
-    
-    # Add annotations (correlation values)
-    for i, row in enumerate(corr_z):
-        for j, val in enumerate(row):
-            fig6.add_annotation(
-                x=corr_df.columns[j],
-                y=corr_df.columns[i],
-                text=f"{val:.2f}",
-                showarrow=False,
-                font=dict(color="white" if abs(val) > 0.5 else "black")
-            )
-    
-    fig6.update_layout(
-        title="Correlation Between Money Supply and Credit Variables"
+
+# Add annotations (correlation values)
+for i, row in enumerate(corr_z):
+    for j, val in enumerate(row):
+        fig6.add_annotation(
+            x=corr_df.columns[j],  # x position for annotation (column name)
+            y=corr_df.columns[i],  # y position for annotation (row name)
+            text=f"{val:.2f}",  # Display the correlation value rounded to two decimal places
+            showarrow=False,  # No arrow needed, just the value
+            font=dict(color="white" if abs(val) > 0.5 else "black")  # Font color based on correlation strength
+        )
+
+# Update layout with title
+fig6.update_layout(
+        title="Correlation Between Credit and Money Supply Variables"
     )
-    
-    st.plotly_chart(fig6, use_container_width=True)
+
+# Display the heatmap in Streamlit
+st.subheader("Correlation Matrix: Credit Variables vs Money Supply")
+st.plotly_chart(fig6, use_container_width=True)
+
 
 # DASHBOARD 3: ECONOMIC LIQUIDITY INDICATORS
 with tab3:
