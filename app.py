@@ -6,16 +6,19 @@ import plotly.graph_objects as go
 import numpy as np
 from plotly.subplots import make_subplots
 
+
+
 # Load the dataset
 @st.cache_data
 def load_data():
+ 
     df = pd.read_csv("Monetary_stats_1995-2025.csv")
     # Ensure that the 'Date' column is in datetime format and remove the time part
     df['Date'] = pd.to_datetime(df['Date'], errors='coerce').dt.normalize()
     # Extract year and use it for the filter
     df['Year'] = df['Date'].dt.year
-    # Calculate the total for M1, M2, and M2b by adding the three columns
-    df['Total'] = df["Narrow Money (M1) \n(c)    \n (1) + (2)"] + df["Broad Money (M2) (b)"] + df["Broad Money (M2b) \n(d)            \n (3) + (4)"]
+
+    df['Total'] = df["Broad Money (M2b) \n(d)            \n (3) + (4)"]
     return df
 
 # Set Streamlit page config and styling
@@ -24,6 +27,22 @@ st.markdown('<style>div.block-container{padding-top:1rem;}</style>', unsafe_allo
 
 # Load data
 df = load_data()
+df['Date'] = df['Date'].dt.date
+
+#Setting a background
+st.markdown(
+"""
+    <style>
+    .stApp {
+        background-image: url("C:/Users/tharu/OneDrive/Documents/IIT/IIT-second year/Second sem/Project lifecycle/Courseworks-DSPL/W2052147_Monetary-Trends/MOF image.jpg");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+    </style>
+    """, unsafe_allow_html=True
+)
 
 # Common header for all dashboards
 def display_header():
@@ -55,6 +74,7 @@ def display_sidebar_filters(df):
     st.sidebar.header("Filter Data")
 
     # Add date-related columns
+    df['Date'] = pd.to_datetime(df['Date'])
     df['Year'] = df['Date'].dt.year
     df['Month_Name'] = df['Date'].dt.month_name()
     df['Quarter'] = df['Date'].dt.quarter
@@ -78,7 +98,6 @@ def display_sidebar_filters(df):
 
     return filtered_df
 
-# Call the function with your DataFrame
 filtered_df = display_sidebar_filters(df)
 
 # Create main tabs for different dashboards
@@ -131,10 +150,10 @@ with tab1:
     
 
     # Add a pie chart to the dashboard
-    st.subheader("Distribution of Money Supply Components (Pie Chart)")
+    st.subheader("Distribution of Money Supply Components (%)")
     
     # Summing up the latest available data for the components
-    latest_data = filtered_df.iloc[-1]  # Get the latest row of data
+    latest_data = filtered_df.iloc[-1]  
     money_supply = [
         latest_data["Reserve Money (M0)  (a)"],
         latest_data["Narrow Money (M1) \n(c)    \n (1) + (2)"],
@@ -150,10 +169,30 @@ with tab1:
         title='Pie Chart of Money Supply Components',
         legend_title='Money Supply Types'
     )
-    
+
     st.plotly_chart(fig4, use_container_width=True)
+
+    st.subheader("Yearly Summary of Money Supply Components")
     
-    # Add an expander for the raw data
+    # Group data by year and calculate the total sum for each component
+    yearly_summary = filtered_df.groupby(filtered_df['Date'].dt.year).agg({
+        "Reserve Money (M0)  (a)": "sum",
+        "Narrow Money (M1) \n(c)    \n (1) + (2)": "sum",
+        "Broad Money (M2) (b)": "sum",
+        "Broad Money (M2b) \n(d)            \n (3) + (4)": "sum"
+    }).reset_index()
+
+    # Rename columns for better display
+    yearly_summary.rename(columns={
+        "Date": "Year",
+        "Reserve Money (M0)  (a)": "M0",
+        "Narrow Money (M1) \n(c)    \n (1) + (2)": "M1",
+        "Broad Money (M2) (b)": "M2",
+        "Broad Money (M2b) \n(d)            \n (3) + (4)": "M2b"
+    }, inplace=True)
+
+    st.dataframe(yearly_summary, use_container_width=True)
+    
     with st.expander("View Raw Data"):
         st.write(filtered_df[["Date", "Narrow Money (M1) \n(c)    \n (1) + (2)", "Broad Money (M2) (b)", "Broad Money (M2b) \n(d)            \n (3) + (4)"]])
         st.download_button("Download Data", filtered_df.to_csv().encode("utf-8"), "money_supply_data.csv", "text/csv")
@@ -167,8 +206,7 @@ with tab2:
     
     with col1:
         # Line chart: Private sector credit, total domestic credit over time
-        # Replace with actual column names from your dataset
-        credit_columns = ["Broad Money (M2) (b)", "Broad Money (M2b) \n(d)            \n (3) + (4)"]  # Replace with actual credit columns
+        credit_columns = ["Net Credit granted to the Government by Central Bank", "Net Credit granted to the Government by Commercial Banks","Net Credit granted to the Government (NCG)\n(8) + (9)","Credit granted to Public Corporations by Commercial Banks","Credit granted to the Private Sector by Commercial Banks","Domestic Credit \n(10) + (11) + (12)"]  # Replace with actual credit columns
         
         fig4 = go.Figure()
         for col in credit_columns:
@@ -191,9 +229,8 @@ with tab2:
             secondary_y=False,
         )
         
-        # Replace with actual private sector credit column
         fig5.add_trace(
-            go.Scatter(x=filtered_df["Date"], y=filtered_df["Broad Money (M2b) \n(d)            \n (3) + (4)"], name="Private Sector Credit"),
+            go.Scatter(x=filtered_df["Date"], y=filtered_df["Credit granted to the Private Sector by Commercial Banks"], name="Private Sector Credit"),
             secondary_y=True,
         )
         
@@ -418,13 +455,13 @@ with tab5:
     
     with col1:
         # Peak M2 growth
-        max_m2_growth = df_temp['M2_Growth'].max()
+        max_m2_growth = filtered_df['M2_Growth'].max()
         # Handle potential NaN values
         if pd.isna(max_m2_growth):
             max_m2_growth = 0
             max_m2_growth_date = "N/A"
         else:
-            max_m2_growth_date = df_temp.loc[df_temp['M2_Growth'].idxmax(), 'Date'].strftime('%b %Y') if not pd.isna(df_temp['M2_Growth'].idxmax()) else "N/A"
+            max_m2_growth_date = filtered_df.loc[filtered_df['M2_Growth'].idxmax(), 'Date'].strftime('%b %Y') if not pd.isna(filtered_df['M2_Growth'].idxmax()) else "N/A"
         
         st.metric(
             label="Peak M2 Growth", 
