@@ -387,12 +387,24 @@ with tab4:
     
     # Variables for selection
     available_variables = [
-        "Narrow Money (M1) \n(c)    \n (1) + (2)", 
+        "Reserve Money (M0)  (a)", 
         "Broad Money (M2) (b)", 
+        "Currency held by the Public",
+        "Demand Deposits held by the Public",
+        "Narrow Money (M1) \n(c)    \n (1) + (2)",
+        "Time and Savings Deposits held by the Public",
         "Broad Money (M2b) \n(d)            \n (3) + (4)",
-        "Interest_Rate",
-        "Reserve_Money",
-        "Inflation"
+        "Net Foreign Assets of Monetary Authorities (e)",
+        "Net Foreign Assets of Commercial Banks ",
+        "Net Foreign Assets (NFA) \n(5) + (6)",
+        "Net Credit granted to the Government by Central Bank",
+        "Net Credit granted to the Government by Commercial Banks",
+        "Net Credit granted to the Government (NCG)\n(8) + (9)",
+        "Credit granted to Public Corporations by Commercial Banks",
+        "Credit granted to the Private Sector by Commercial Banks",
+        "Domestic Credit \n(10) + (11) + (12)",
+        "Net Domestic Assets  (NDA)       \n (13) + (14)",
+        "Broad Money (M2b)\n (7) + (15)"
     ]
     
     col1, col2 = st.columns(2)
