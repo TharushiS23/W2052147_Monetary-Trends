@@ -290,52 +290,59 @@ with tab3:
     display_header()
     st.header("Economic Liquidity Indicators")
     
-    # Set up columns layout
-    col1, col2 = st.columns(2)
+
+# Bubble Chart: Liquidity Measures vs Foreign Assets
+    filtered_df['Month'] = pd.to_datetime(filtered_df['Date']).dt.strftime('%B')
+    fig7 = px.scatter(
+        filtered_df,
+        x="Broad Money (M2b) \n(d)            \n (3) + (4)",  
+        y="Net Foreign Assets of Monetary Authorities (e)",
+        size="Net Credit granted to the Government by Central Bank",
+        color="Month",  # color by Year instead of Date
+        title="Liquidity Measures and Foreign Assets",
+        labels={
+            "Broad Money (M2b) \n(d)            \n (3) + (4)": "Broad Money (M2b) (Rs. Mn)",
+            "Net Foreign Assets of Monetary Authorities (e)": "Net Foreign Assets (Rs. Mn)",
+            "Net Credit granted to the Government by Central Bank": "Credit to Government (Rs. Mn)",
+            "Month": "Month"
+        }
+    )
+    fig7.update_layout(
+        xaxis_title="Broad Money (M2b) (Rs. Mn)",
+        yaxis_title="Net Foreign Assets of Monetary Authorities (Rs. Mn)"
+    )
+    st.plotly_chart(fig7, use_container_width=True)
     
-    with col1:
-        # Bubble Chart: Liquidity Measures vs Foreign Assets
-        filtered_df['Month'] = pd.to_datetime(filtered_df['Date']).dt.strftime('%B')
-        fig7 = px.scatter(
-            filtered_df,
-            x="Broad Money (M2b) \n(d)            \n (3) + (4)",  
-            y="Net Foreign Assets of Monetary Authorities (e)",
-            size="Net Credit granted to the Government by Central Bank",
-            color="Month",  # color by Year instead of Date
-            title="Liquidity Measures and Foreign Assets",
-            labels={
-                "Broad Money (M2b) \n(d)            \n (3) + (4)": "Broad Money (M2b) (Rs. Mn)",
-                "Net Foreign Assets of Monetary Authorities (e)": "Net Foreign Assets (Rs. Mn)",
-                "Net Credit granted to the Government by Central Bank": "Credit to Government (Rs. Mn)",
-                "Month": "Month"
-            }
-        )
-        fig7.update_layout(
-            xaxis_title="Broad Money (M2b) (Rs. Mn)",
-            yaxis_title="Net Foreign Assets of Monetary Authorities (Rs. Mn)"
-        )
-        st.plotly_chart(fig7, use_container_width=True)
-    
-    with col2:
-        # Violin Plot: Distribution of Credit Types
-        fig8 = px.violin(
-            filtered_df.melt(
-                id_vars=["Date"], 
-                value_vars=[
-                    "Credit to Government (Net) (Rs.Mn)", 
-                    "Credit to Public Corporations (Net) (Rs.Mn)",
-                    "Credit to the Private Sector (Rs.Mn)"
-                ],
-                var_name="Credit Type",
-                value_name="Amount (Rs.Mn)"
-            ),
-            x="Credit Type",
-            y="Amount (Rs.Mn)",
-            box=True,
-            points="all",
-            title="Distribution of Credit Types"
-        )
-        st.plotly_chart(fig8, use_container_width=True)
+
+# Area Chart: Liquidity Ratios Over Time
+    liquidity_df = filtered_df.copy()
+
+    # Calculate Liquidity Ratios
+    liquidity_df["Currency Ratio"] = liquidity_df["Currency held by the Public"] / liquidity_df["Narrow Money (M1) \n(c)    \n (1) + (2)"]
+    liquidity_df["Reserve Money Ratio"] = liquidity_df["Reserve Money (M0)  (a)"] / liquidity_df["Broad Money (M2) (b)"]
+    liquidity_df["Money Multiplier"] = liquidity_df["Broad Money (M2) (b)"] / liquidity_df["Reserve Money (M0)  (a)"]
+    liquidity_df["Deposit Ratio"] = liquidity_df["Demand Deposits held by the Public"] / liquidity_df["Narrow Money (M1) \n(c)    \n (1) + (2)"]
+
+    # Melt the ratios into long format
+    liquidity_melted = liquidity_df.melt(
+        id_vars=["Date"],
+        value_vars=["Currency Ratio", "Reserve Money Ratio", "Money Multiplier", "Deposit Ratio"],
+        var_name="Liquidity Ratio",
+        value_name="Value"
+    )
+
+    # Plot Area Chart
+    fig8 = px.area(
+        liquidity_melted,
+        x="Date",
+        y="Value",
+        color="Liquidity Ratio",
+        title="Liquidity Ratios Over Time"
+    )
+
+    # Display the chart
+    st.plotly_chart(fig8, use_container_width=True)
+
     
     # Full width for Scatter Matrix
     st.subheader("Correlation of Money Supply Components Over Time")
