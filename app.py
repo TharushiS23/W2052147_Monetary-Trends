@@ -65,7 +65,7 @@ def display_header():
     with col3:
         # Display last updated date
         box_date = str(datetime.datetime.now().strftime("%d %B %Y"))
-        st.write(f"Last updated by:  \n {box_date}")
+        st.write(f"Last updated by: Tharushi Seneviratne  \n {box_date}")
 
 # Common sidebar filters for all dashboards
 def display_sidebar_filters(df):
@@ -513,7 +513,7 @@ with tab5:
         
         st.metric(
             label="Peak M2 Growth", 
-            value=f"{max_m2_growth:.2f}%",
+            value=f"{max_m2_growth:.3f}%",
             delta=f"in {max_m2_growth_date}"
         )
     
@@ -524,7 +524,7 @@ with tab5:
         
         st.metric(
             label="Maximum M1 Value", 
-            value=f"{max_m1/1000:.1f}B",  # Dividing by 1000 to show in billions
+            value=f"{max_m1/1000:.1f}B",  
             delta=f"in {max_m1_date}"
         )
     
@@ -535,13 +535,13 @@ with tab5:
         
         st.metric(
             label="Maximum M0 Value", 
-            value=f"{max_m0/1000:.1f}B",  # Dividing by 1000 to show in billions
+            value=f"{max_m0/1000:.1f}B",  
             delta=f"in {max_m0_date}"
         )
     
     st.subheader("Summary Points")
     
-    # Key points (replace with actual insights based on your data)
+    # Key points 
     st.markdown(""" 
     ### Key Observations:
     - The M2 money supply has grown significantly over the past decade, particularly during periods of economic instability.
