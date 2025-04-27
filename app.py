@@ -287,12 +287,14 @@ with tab2:
 
 # DASHBOARD 3: ECONOMIC LIQUIDITY INDICATORS
 with tab3:
-    display_header()
-    st.header("Economic Liquidity Indicators")
-    
 
-# Bubble Chart: Liquidity Measures vs Foreign Assets
+    display_header()
+
+    st.header("Economic Liquidity Indicators")
+
+    # Bubble Chart: Liquidity Measures vs Foreign Assets
     filtered_df['Month'] = pd.to_datetime(filtered_df['Date']).dt.strftime('%B')
+
     fig7 = px.scatter(
         filtered_df,
         x="Broad Money (M2b) \n(d)            \n (3) + (4)",  
@@ -312,9 +314,8 @@ with tab3:
         yaxis_title="Net Foreign Assets of Monetary Authorities (Rs. Mn)"
     )
     st.plotly_chart(fig7, use_container_width=True)
-    
 
-# Area Chart: Liquidity Ratios Over Time
+    # Area Chart: Liquidity Ratios Over Time
     liquidity_df = filtered_df.copy()
 
     # Calculate Liquidity Ratios
@@ -343,25 +344,34 @@ with tab3:
     # Display the chart
     st.plotly_chart(fig8, use_container_width=True)
 
-    
-    # Full width for Scatter Matrix
-    st.subheader("Correlation of Money Supply Components Over Time")
-    fig9 = px.scatter_matrix(
-        filtered_df,
-        dimensions=[
-            "Narrow Money (M1) \n(c)    \n (1) + (2)",
-            "Broad Money (M2) (Rs.Mn)",
-            "Broad Money (M2b) (Rs.Mn)"
-        ],
-        color="Year",  # Assuming you have a 'Year' column
-        title="Scatter Matrix of Money Supply Components"
+    # Sunburst Chart: Breakdown of Domestic and Foreign Liquidity
+    liquidity_df = filtered_df.copy()
+
+    # Step 1: Categorize data into Domestic and Foreign liquidity
+    liquidity_df['Liquidity Type'] = 'Domestic'
+    liquidity_df.loc[liquidity_df['Net Foreign Assets of Monetary Authorities (e)'] > 0, 'Liquidity Type'] = 'Foreign'
+
+    # Step 2: Create new columns for the liquidity components
+    liquidity_df['Domestic Credit'] = liquidity_df["Net Credit granted to the Government by Central Bank"] + liquidity_df["Net Credit granted to the Government by Commercial Banks"] + liquidity_df["Credit granted to Public Corporations by Commercial Banks"] + liquidity_df["Credit granted to the Private Sector by Commercial Banks"]
+    liquidity_df['Foreign Assets'] = liquidity_df["Net Foreign Assets of Monetary Authorities (e)"] + liquidity_df["Net Foreign Assets of Commercial Banks "]
+
+    # Step 3: Create a Sunburst chart structure
+    sunburst_df = liquidity_df[['Liquidity Type', 'Domestic Credit', 'Foreign Assets']]
+
+    # Reshape the DataFrame for Sunburst chart
+    sunburst_df_melted = sunburst_df.melt(id_vars=['Liquidity Type'], value_vars=['Domestic Credit', 'Foreign Assets'], var_name='Liquidity Component', value_name='Amount')
+
+    # Step 4: Plot the Sunburst chart
+    fig = px.sunburst(
+        sunburst_df_melted, 
+        path=['Liquidity Type', 'Liquidity Component'],  # Hierarchy: Domestic/Foreign -> Credit/Assets
+        values='Amount',  # Values to visualize (amounts)
+        title="Breakdown of Domestic and Foreign Liquidity"
     )
-    fig9.update_layout(
-        dragmode='select',
-        width=900,
-        height=800
-    )
-    st.plotly_chart(fig9, use_container_width=True)
+
+    # Display the Sunburst chart
+    st.plotly_chart(fig, use_container_width=True)
+
 
 # DASHBOARD 4: RELATIONSHIP EXPLORER
 with tab4:
