@@ -4,7 +4,7 @@ import datetime
 from PIL import Image
 import plotly.graph_objects as go
 import numpy as np
-import plotly as px
+import plotly.express as px
 from plotly.subplots import make_subplots
 
 # Load the dataset
@@ -291,65 +291,70 @@ with tab3:
     st.header("Economic Liquidity Indicators")
     
     # Set up columns layout
-col1, col2 = st.columns(2)
-
-with col1:
-    # Bubble Chart: Money Supply vs GDP
-    fig7 = px.scatter(
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        # Bubble Chart: Liquidity Measures vs Foreign Assets
+        filtered_df['Month'] = pd.to_datetime(filtered_df['Date']).dt.strftime('%B')
+        fig7 = px.scatter(
+            filtered_df,
+            x="Broad Money (M2b) \n(d)            \n (3) + (4)",  
+            y="Net Foreign Assets of Monetary Authorities (e)",
+            size="Net Credit granted to the Government by Central Bank",
+            color="Month",  # color by Year instead of Date
+            title="Liquidity Measures and Foreign Assets",
+            labels={
+                "Broad Money (M2b) \n(d)            \n (3) + (4)": "Broad Money (M2b) (Rs. Mn)",
+                "Net Foreign Assets of Monetary Authorities (e)": "Net Foreign Assets (Rs. Mn)",
+                "Net Credit granted to the Government by Central Bank": "Credit to Government (Rs. Mn)",
+                "Month": "Month"
+            }
+        )
+        fig7.update_layout(
+            xaxis_title="Broad Money (M2b) (Rs. Mn)",
+            yaxis_title="Net Foreign Assets of Monetary Authorities (Rs. Mn)"
+        )
+        st.plotly_chart(fig7, use_container_width=True)
+    
+    with col2:
+        # Violin Plot: Distribution of Credit Types
+        fig8 = px.violin(
+            filtered_df.melt(
+                id_vars=["Date"], 
+                value_vars=[
+                    "Credit to Government (Net) (Rs.Mn)", 
+                    "Credit to Public Corporations (Net) (Rs.Mn)",
+                    "Credit to the Private Sector (Rs.Mn)"
+                ],
+                var_name="Credit Type",
+                value_name="Amount (Rs.Mn)"
+            ),
+            x="Credit Type",
+            y="Amount (Rs.Mn)",
+            box=True,
+            points="all",
+            title="Distribution of Credit Types"
+        )
+        st.plotly_chart(fig8, use_container_width=True)
+    
+    # Full width for Scatter Matrix
+    st.subheader("Correlation of Money Supply Components Over Time")
+    fig9 = px.scatter_matrix(
         filtered_df,
-        x="Broad Money (M2b) (Rs.Mn)", 
-        y="GDP at Current Market Prices (Rs.Mn)",
-        size="Narrow Money (M1) \n(c)    \n (1) + (2)",
-        color="Broad Money (M2) (Rs.Mn)", 
-        hover_name="Date",
-        title="Money Supply vs GDP (Bubble Chart)"
+        dimensions=[
+            "Narrow Money (M1) \n(c)    \n (1) + (2)",
+            "Broad Money (M2) (Rs.Mn)",
+            "Broad Money (M2b) (Rs.Mn)"
+        ],
+        color="Year",  # Assuming you have a 'Year' column
+        title="Scatter Matrix of Money Supply Components"
     )
-    fig7.update_layout(
-        xaxis_title="Broad Money (M2b) (Rs. Mn)",
-        yaxis_title="GDP at Current Market Prices (Rs. Mn)"
+    fig9.update_layout(
+        dragmode='select',
+        width=900,
+        height=800
     )
-    st.plotly_chart(fig7, use_container_width=True)
-
-with col2:
-    # Violin Plot: Distribution of Credit Types
-    fig8 = px.violin(
-        filtered_df.melt(
-            id_vars=["Date"], 
-            value_vars=[
-                "Credit to Government (Net) (Rs.Mn)", 
-                "Credit to Public Corporations (Net) (Rs.Mn)",
-                "Credit to the Private Sector (Rs.Mn)"
-            ],
-            var_name="Credit Type",
-            value_name="Amount (Rs.Mn)"
-        ),
-        x="Credit Type",
-        y="Amount (Rs.Mn)",
-        box=True,
-        points="all",
-        title="Distribution of Credit Types"
-    )
-    st.plotly_chart(fig8, use_container_width=True)
-
-# Full width for Scatter Matrix
-st.subheader("Correlation of Money Supply Components Over Time")
-
-fig9 = px.scatter_matrix(
-    filtered_df,
-    dimensions=[
-        "Narrow Money (M1) \n(c)    \n (1) + (2)",
-        "Broad Money (M2) (Rs.Mn)",
-        "Broad Money (M2b) (Rs.Mn)"
-    ],
-    color="Year",  # Assuming you have a 'Year' column
-    title="Scatter Matrix of Money Supply Components"
-)
-fig9.update_layout(
-    dragmode='select',
-    width=900,
-    height=800
-)
-st.plotly_chart(fig9, use_container_width=True)
+    st.plotly_chart(fig9, use_container_width=True)
 
 # DASHBOARD 4: RELATIONSHIP EXPLORER
 with tab4:
