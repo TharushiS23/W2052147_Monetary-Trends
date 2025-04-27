@@ -76,18 +76,25 @@ def display_sidebar_filters(df):
     df['Month_Name'] = df['Date'].dt.month_name()
     df['Quarter'] = df['Date'].dt.quarter
     # Sidebar filters
-    year_filter = st.sidebar.selectbox("Select Year", sorted(df['Year'].unique()))
+    year_filter = st.sidebar.selectbox("Select Year", ['All'] + sorted(df['Year'].unique().tolist()))
     quarter_filter = st.sidebar.selectbox("Select Quarter", ['All', 'Q1', 'Q2', 'Q3', 'Q4'])
     month_filter = st.sidebar.selectbox("Select Month", ['All'] + list(df['Month_Name'].unique()))
+    
     # Apply year filter
-    filtered_df = df[df['Year'] == year_filter]
+    if year_filter == 'All':
+        filtered_df = df  # No filtering on year if 'All' is selected
+    else:
+        filtered_df = df[df['Year'] == year_filter]
+    
     # Apply quarter filter
     if quarter_filter != 'All':
         q_map = {'Q1': 1, 'Q2': 2, 'Q3': 3, 'Q4': 4}
         filtered_df = filtered_df[filtered_df['Quarter'] == q_map[quarter_filter]]
+    
     # Apply month filter
     if month_filter != 'All':
         filtered_df = filtered_df[filtered_df['Month_Name'] == month_filter]
+    
     return filtered_df
 
 filtered_df = display_sidebar_filters(df)
@@ -468,6 +475,7 @@ with tab4:
     else:
         st.write("There is a strong negative correlation between the selected variables.")
 
+
 # DASHBOARD 5: KEY INSIGHTS & HIGHLIGHTS
 with tab5:
     display_header()
@@ -477,6 +485,11 @@ with tab5:
     col1, col2, col3 = st.columns(3)
     
     with col1:
+        # Check if 'M2_Growth' exists, otherwise calculate it
+        if 'M2_Growth' not in filtered_df.columns:
+            # Assuming 'M2_Growth' is the growth rate from previous year, calculate it
+            filtered_df['M2_Growth'] = filtered_df['Broad Money (M2) (b)'].pct_change() * 100
+        
         # Peak M2 growth
         max_m2_growth = filtered_df['M2_Growth'].max()
         # Handle potential NaN values
@@ -494,41 +507,41 @@ with tab5:
     
     with col2:
         # Max M1 value
-        max_m1 = df["Narrow Money (M1) \n(c)    \n (1) + (2)"].max()
-        max_m1_date = df.loc[df["Narrow Money (M1) \n(c)    \n (1) + (2)"].idxmax(), 'Date'].strftime('%b %Y') if not pd.isna(df["Narrow Money (M1) \n(c)    \n (1) + (2)"].idxmax()) else "N/A"
+        max_m1 = filtered_df["Narrow Money (M1) \n(c)    \n (1) + (2)"].max()
+        max_m1_date = filtered_df.loc[filtered_df["Narrow Money (M1) \n(c)    \n (1) + (2)"].idxmax(), 'Date'].strftime('%b %Y') if not pd.isna(filtered_df["Narrow Money (M1) \n(c)    \n (1) + (2)"].idxmax()) else "N/A"
         
         st.metric(
             label="Maximum M1 Value", 
-            value=f"{max_m1/1000:.1f}B",
+            value=f"{max_m1/1000:.1f}B",  # Dividing by 1000 to show in billions
             delta=f"in {max_m1_date}"
         )
     
     with col3:
-        # Average inflation (using our placeholder data)
-        avg_inflation = filtered_df['Inflation'].mean()
+        # Max Reserve Money (M0) value
+        max_m0 = filtered_df["Reserve Money (M0)  (a)"].max()
+        max_m0_date = filtered_df.loc[filtered_df["Reserve Money (M0)  (a)"].idxmax(), 'Date'].strftime('%b %Y') if not pd.isna(filtered_df["Reserve Money (M0)  (a)"].idxmax()) else "N/A"
         
         st.metric(
-            label="Average Inflation", 
-            value=f"{avg_inflation:.2f}%",
-            delta=None
+            label="Maximum M0 Value", 
+            value=f"{max_m0/1000:.1f}B",  # Dividing by 1000 to show in billions
+            delta=f"in {max_m0_date}"
         )
     
     st.subheader("Summary Points")
     
     # Key points (replace with actual insights based on your data)
-    st.markdown("""
+    st.markdown(""" 
     ### Key Observations:
-    - M2 money supply has grown at an average rate of X% per year over the past decade
-    - During economic crisis periods (2008, 2019), money supply growth accelerated
-    - Private sector credit and M2 show a strong positive correlation (r = 0.8)
-    - Reserve money fluctuations tend to precede inflation changes by approximately 6 months
+    - The M2 money supply has grown significantly over the past decade, particularly during periods of economic instability.
+    - M1 and M2 show a positive correlation, reflecting the relationship between narrow and broad money supply.
+    - Reserve money fluctuations tend to precede broader monetary supply trends.
     
     ### Major Economic Events:
-    - **2008 Global Financial Crisis**: Sharp decline in credit growth but increased money supply
-    - **2019 Economic Downturn**: Record levels of reserve money injection
-    - **2020-2022 COVID-19 Response**: Unprecedented expansion in M1 and M2
+    - **2008 Global Financial Crisis**: A significant impact on the money supply and reserve money.
+    - **2019 Economic Downturn**: Increased central bank intervention and reserve money injections.
+    - **COVID-19 Pandemic (2020-2022)**: Massive increase in money supply to stimulate the economy.
     """)
-    
+
     # Key trend visualization
     st.subheader("Long-Term Money Supply Trend")
     
@@ -536,14 +549,14 @@ with tab5:
     fig11 = go.Figure()
     
     # Use annual averages for cleaner visualization
-    annual_avg = df.groupby('Year')[["Narrow Money (M1) \n(c)    \n (1) + (2)", "Broad Money (M2) (b)", "Broad Money (M2b) \n(d)            \n (3) + (4)"]].mean().reset_index()
+    filtered_df['Year'] = filtered_df['Date'].dt.year  # Ensure Year is available for grouping
+    annual_avg = filtered_df.groupby('Year')[["Narrow Money (M1) \n(c)    \n (1) + (2)", "Broad Money (M2) (b)", "Broad Money (M2b) \n(d)            \n (3) + (4)"]].mean().reset_index()
     
     fig11.add_trace(go.Scatter(x=annual_avg["Year"], y=annual_avg["Narrow Money (M1) \n(c)    \n (1) + (2)"], mode='lines+markers', name='M1'))
     fig11.add_trace(go.Scatter(x=annual_avg["Year"], y=annual_avg["Broad Money (M2) (b)"], mode='lines+markers', name='M2'))
     fig11.add_trace(go.Scatter(x=annual_avg["Year"], y=annual_avg["Broad Money (M2b) \n(d)            \n (3) + (4)"], mode='lines+markers', name='M2b'))
     
     # Add annotations for major events (replace with actual years/events)
-    # Check if years exist in the data before adding annotations
     if 2008 in annual_avg['Year'].values:
         fig11.add_annotation(
             x=2008, 
