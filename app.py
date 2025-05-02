@@ -9,7 +9,7 @@ from plotly.subplots import make_subplots
 
 # Load the dataset
 @st.cache_data
-def load_data():
+def main():
  
     df = pd.read_csv("Monetary_stats_1995-2025.csv")
     # Ensure that the 'Date' column is in datetime format and remove the time part
@@ -24,36 +24,8 @@ st.set_page_config(layout="wide")
 st.markdown('<style>div.block-container{padding-top:1rem;}</style>', unsafe_allow_html=True)
 
 # Load data
-df = load_data()
+df = main()
 df['Date'] = df['Date'].dt.date
-
-st.markdown(
-    """
-    <style>
-    .full-container {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        background: url('https://w0.peakpx.com/wallpaper/10/708/HD-wallpaper-money-dollar-coin-gold-money-gold-coin-dollar.jpg') no-repeat center center fixed;
-        background-size: cover;
-        padding: 0;
-        margin: 0;
-    }
-
-    .main-box {
-        width: 80%;
-        height: 90%;
-        background: rgba(255, 255, 255, 0.8);
-        border-radius: 10px;
-        padding: 20px;
-        overflow: auto;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
 
 # Common header for all dashboards
 def display_header():
@@ -79,6 +51,7 @@ def display_header():
         # Display last updated date
         box_date = str(datetime.datetime.now().strftime("%d %B %Y"))
         st.write(f"Last updated by: Tharushi Seneviratne  \n {box_date}")
+
 
 # Common sidebar filters for all dashboards
 def display_sidebar_filters(df):
@@ -611,5 +584,5 @@ with tab5:
   
     st.plotly_chart(fig11, use_container_width=True)
 
-if __name__ == "__load_data__":
-   load_data()
+if __name__ == "__main__":
+    run_dashboard()
