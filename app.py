@@ -595,4 +595,8 @@ with tab5:
         legend_title='Money Supply Measures'
     )
     
+  
     st.plotly_chart(fig11, use_container_width=True)
+
+if __name__ == "__load_data__":
+   load_data()
