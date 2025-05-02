@@ -7,85 +7,71 @@ import numpy as np
 import plotly.express as px
 from plotly.subplots import make_subplots
 
-# Load the dataset
+# Page config
+st.set_page_config(layout="wide")
+st.markdown('<style>div.block-container{padding-top:1rem;}</style>', unsafe_allow_html=True)
+
+# Load dataset
 @st.cache_data
 def main():
- 
     df = pd.read_csv("Monetary_stats_1995-2025.csv")
-    # Ensure that the 'Date' column is in datetime format and remove the time part
     df['Date'] = pd.to_datetime(df['Date'], errors='coerce').dt.normalize()
-    # Extract year and use it for the filter
     df['Year'] = df['Date'].dt.year
     df['Total'] = df["Broad Money (M2b) \n(d)            \n (3) + (4)"]
     return df
 
-# Set Streamlit page config and styling
-st.set_page_config(layout="wide")
-st.markdown('<style>div.block-container{padding-top:1rem;}</style>', unsafe_allow_html=True)
-
-# Load data
-df = main()
-df['Date'] = df['Date'].dt.date
-
-# Common header for all dashboards
+# Header section (shows logo and title)
 def display_header():
     image = Image.open('MOF image.jpg')
     col1, col2 = st.columns([0.1, 0.9])
     with col1:
         st.image(image, width=100)
-    
-    html_title = """
-        <style>
-        .title-test {
-        font-weight:bold;
-        padding:5px;
-        border-radius:6px;
-        }
-        </style>
-        <center><h1 class="title-test">Monetary trends 1995-2025</h1></center>"""
     with col2:
-        st.markdown(html_title, unsafe_allow_html=True)
-    
+        st.markdown("""
+            <style>
+            .title-test {
+                font-weight:bold;
+                padding:5px;
+                border-radius:6px;
+            }
+            </style>
+            <center><h1 class="title-test">Monetary trends 1995-2025</h1></center>
+        """, unsafe_allow_html=True)
     col1, col2, col3 = st.columns([0.2, 0.8, 0.1])
     with col3:
-        # Display last updated date
-        box_date = str(datetime.datetime.now().strftime("%d %B %Y"))
-        st.write(f"Last updated by: Tharushi Seneviratne  \n {box_date}")
+        date_str = datetime.datetime.now().strftime("%d %B %Y")
+        st.write(f"Last updated by: Tharushi Seneviratne  \n {date_str}")
 
-
-# Common sidebar filters for all dashboards
+# Sidebar filters
 def display_sidebar_filters(df):
     st.sidebar.header("Filter Data")
-    # Add date-related columns
     df['Date'] = pd.to_datetime(df['Date'])
     df['Year'] = df['Date'].dt.year
     df['Month_Name'] = df['Date'].dt.month_name()
     df['Quarter'] = df['Date'].dt.quarter
-    # Sidebar filters
+
     year_filter = st.sidebar.selectbox("Select Year", ['All'] + sorted(df['Year'].unique().tolist()))
     quarter_filter = st.sidebar.selectbox("Select Quarter", ['All', 'Q1', 'Q2', 'Q3', 'Q4'])
     month_filter = st.sidebar.selectbox("Select Month", ['All'] + list(df['Month_Name'].unique()))
-    
-    # Apply year filter
-    if year_filter == 'All':
-        filtered_df = df  # No filtering on year if 'All' is selected
-    else:
-        filtered_df = df[df['Year'] == year_filter]
-    
-    # Apply quarter filter
+
+    if year_filter != 'All':
+        df = df[df['Year'] == year_filter]
     if quarter_filter != 'All':
         q_map = {'Q1': 1, 'Q2': 2, 'Q3': 3, 'Q4': 4}
-        filtered_df = filtered_df[filtered_df['Quarter'] == q_map[quarter_filter]]
-    
-    # Apply month filter
+        df = df[df['Quarter'] == q_map[quarter_filter]]
     if month_filter != 'All':
-        filtered_df = filtered_df[filtered_df['Month_Name'] == month_filter]
-    
-    return filtered_df
+        df = df[df['Month_Name'] == month_filter]
 
-filtered_df = display_sidebar_filters(df)
+    return df
 
-# Create main tabs for different dashboards
+# Run the app
+df = main()
+df['Date'] = df['Date'].dt.date
+
+# Show header once, at the top
+display_header()
+
+# Tabs (rendered correctly)
 tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "Money Supply Overview", 
     "Credit Availability Trends", 
@@ -94,9 +80,11 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "Key Insights & Highlights"
 ])
 
+# Sidebar filters applied after tab setup
+filtered_df = display_sidebar_filters(df)
+
 # DASHBOARD 1: MONEY SUPPLY OVERVIEW
 with tab1:
-    display_header()
     st.header("Overview of Money Supply Components")
     
     col1, col2 = st.columns(2)
@@ -180,7 +168,6 @@ with tab1:
 
 # DASHBOARD 2: CREDIT AVAILABILITY TRENDS
 with tab2:
-    display_header()
     st.header("Credit Availability Trends")
     
     col1, col2 = st.columns(2)
@@ -282,8 +269,6 @@ with tab2:
 # DASHBOARD 3: ECONOMIC LIQUIDITY INDICATORS
 with tab3:
 
-    display_header()
-
     st.header("Economic Liquidity Indicators")
 
     # Bubble Chart: Liquidity Measures vs Foreign Assets
@@ -366,10 +351,8 @@ with tab3:
     # Display the Sunburst chart
     st.plotly_chart(fig, use_container_width=True)
 
-
 # DASHBOARD 4: RELATIONSHIP EXPLORER
 with tab4:
-    display_header()
     st.header("Relationship Explorer")
     
     # Variables for selection
@@ -474,10 +457,8 @@ with tab4:
     else:
         st.write("There is a strong negative correlation between the selected variables.")
 
-
 # DASHBOARD 5: KEY INSIGHTS & HIGHLIGHTS
 with tab5:
-    display_header()
     st.header("Key Insights & Highlights")
     
     # KPI cards

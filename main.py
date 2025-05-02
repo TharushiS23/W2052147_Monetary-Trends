@@ -1,15 +1,21 @@
 import streamlit as st
+import loadingpage  # Your loading page module
+import app
 
-# Initialize session state
+# Initialize session state safely
 if 'app' not in st.session_state:
-    st.session_state['app'] = False
+    st.session_state['app'] = False  # or True, depending on your logic
 
-# Determine which page to show
-if st.session_state['app']:
-    # Import and run your existing dashboard
-    import app
-    app.main()  # This runs your existing dashboard code
-else:
-    # Import and run the game/loading page
-    from loadingpage import loading_game
-    loading_game()
+if 'show_dashboard' not in st.session_state:
+    st.session_state.show_dashboard = False
+
+def main():
+
+    # Determine which page to show
+    if st.session_state['app']:
+        loadingpage.run_loading_page()
+    else:
+        app.main()
+
+if __name__ == "__main__":
+    main()

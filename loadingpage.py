@@ -2,7 +2,7 @@ import streamlit as st
 import time
 
 # Loading page with embedded Puzzle Game
-def loading_game():
+def run_loading_page():
     # Customizing the title of the page
     st.set_page_config(page_title="Loading Page", page_icon="🧩")
 
@@ -23,7 +23,7 @@ def loading_game():
 
     # Go to Main App button
     if st.button("Main App"):
-        st.session_state['app'] = True
+        st.session_state.show_dashboard = True
         if "Player_pos" in st.session_state:
             del st.session_state.player_pos
         st.rerun()
