@@ -11,5 +11,5 @@ if st.session_state['app']:
     app.main()  # This runs your existing dashboard code
 else:
     # Import and run the game/loading page
-    from loadingpage import show_loading_game
-    show_loading_game()
+    from loadingpage import loading_game
+    loading_game()
