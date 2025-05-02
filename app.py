@@ -4,19 +4,19 @@ import datetime
 from PIL import Image
 import plotly.graph_objects as go
 import numpy as np
-from plotly.subplots import make_subplots
 import plotly.express as px
+from plotly.subplots import make_subplots
 
 # Load the dataset
 @st.cache_data
 def load_data():
+ 
     df = pd.read_csv("Monetary_stats_1995-2025.csv")
     # Ensure that the 'Date' column is in datetime format and remove the time part
     df['Date'] = pd.to_datetime(df['Date'], errors='coerce').dt.normalize()
     # Extract year and use it for the filter
     df['Year'] = df['Date'].dt.year
-    # Calculate the total for M1, M2, and M2b by adding the three columns
-    df['Total'] = df["Narrow Money (M1) \n(c)    \n (1) + (2)"] + df["Broad Money (M2) (b)"] + df["Broad Money (M2b) \n(d)            \n (3) + (4)"]
+    df['Total'] = df["Broad Money (M2b) \n(d)            \n (3) + (4)"]
     return df
 
 # Set Streamlit page config and styling
