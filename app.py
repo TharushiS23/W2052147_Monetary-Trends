@@ -55,7 +55,6 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-
 # Common header for all dashboards
 def display_header():
     image = Image.open('MOF image.jpg')
