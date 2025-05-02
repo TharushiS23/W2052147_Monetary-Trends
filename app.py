@@ -187,6 +187,7 @@ with tab1:
     }, inplace=True)
     st.dataframe(yearly_summary, use_container_width=True)
     
+    st.subheader("View filterd data")
     with st.expander("View Raw Data"):
         st.write(filtered_df[["Date", "Narrow Money (M1) \n(c)    \n (1) + (2)", "Broad Money (M2) (b)", "Broad Money (M2b) \n(d)            \n (3) + (4)"]])
         st.download_button("Download Data", filtered_df.to_csv().encode("utf-8"), "money_supply_data.csv", "text/csv")
