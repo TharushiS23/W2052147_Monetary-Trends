@@ -23,7 +23,7 @@ def loading_page():
 
     # Give the user the option to go to the main dashboard anytime
     if st.button("Go to Dashboard"):
-        st.experimental_rerun()  # This will reload the page and transition to the main app
+        st.rerun()  # This will reload the page and transition to the main app
 
 if __name__ == "__main__":
     loading_page()
