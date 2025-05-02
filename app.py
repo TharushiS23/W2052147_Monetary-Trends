@@ -21,39 +21,32 @@ def load_data():
 
 # Set Streamlit page config and styling
 st.set_page_config(layout="wide")
-st.markdown('<style>div.block-container{padding-top:1rem;}</style>', unsafe_allow_html=True)
+
+# Add custom CSS for background image and main container box
+st.markdown("""
+    <style>
+    .stApp {
+        background-image: url("https://w0.peakpx.com/wallpaper/10/708/HD-wallpaper-money-dollar-coin-gold-money-gold-coin-dollar.jpg");
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+    
+    .main-container {
+        background-color: rgba(255, 255, 255, 0.85);
+        padding: 20px;
+        border-radius: 10px;
+        margin: 10px;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# Start of main container
+st.markdown('<div class="main-container">', unsafe_allow_html=True)
 
 # Load data
 df = load_data()
 df['Date'] = df['Date'].dt.date
-
-st.markdown(
-    """
-    <style>
-    .full-container {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        background: url('https://w0.peakpx.com/wallpaper/10/708/HD-wallpaper-money-dollar-coin-gold-money-gold-coin-dollar.jpg') no-repeat center center fixed;
-        background-size: cover;
-        padding: 0;
-        margin: 0;
-    }
-
-    .main-box {
-        width: 80%;
-        height: 90%;
-        background: rgba(255, 255, 255, 0.8);
-        border-radius: 10px;
-        padding: 20px;
-        overflow: auto;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
 
 # Common header for all dashboards
 def display_header():
@@ -79,6 +72,7 @@ def display_header():
         # Display last updated date
         box_date = str(datetime.datetime.now().strftime("%d %B %Y"))
         st.write(f"Last updated by: Tharushi Seneviratne  \n {box_date}")
+
 
 # Common sidebar filters for all dashboards
 def display_sidebar_filters(df):
