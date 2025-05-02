@@ -7,7 +7,7 @@ def loading_page():
     st.set_page_config(page_title="Loading Page", page_icon="🧩")
 
     # Header for loading screen
-    st.markdown("<h1 style='text-align: center;'>🧩 Loading... Play Puzzle Game While We Prepare Your Dashboard</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center;'>🧩 Enjoy a quick Sudoku!</h1>", unsafe_allow_html=True)
 
     # Embed the external Puzzle game using an iframe
     st.markdown("""
@@ -19,7 +19,7 @@ def loading_page():
         time.sleep(5)  # Adjust to however long you want your "loading" to appear
 
     # After the loading process, show a message and give the option to go to the dashboard
-    st.success("🎉 Dashboard is ready!")
+    st.success("Dashboard is ready!")
 
     # Give the user the option to go to the main dashboard anytime
     if st.button("Go to Dashboard"):
