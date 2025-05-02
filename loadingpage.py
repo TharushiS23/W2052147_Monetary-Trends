@@ -23,7 +23,7 @@ def loading_game():
 
     # Go to Main App button
     if st.button("Main App"):
-        st.session_state['app_code'] = True
+        st.session_state['app'] = True
         if "Player_pos" in st.session_state:
             del st.session_state.player_pos
         st.rerun()
