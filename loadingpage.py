@@ -11,7 +11,7 @@ def loading_page():
 
     # Embed the external Puzzle game using an iframe
     st.markdown("""
-        <iframe src="https://play.famobi.com/1212" width="800" height="600" frameborder="0" scrolling="no"></iframe>
+        <iframe src="http://www.free-sudoku.com/sudoku-webmaster.php" width="500" height="562" frameborder="0"></iframe>
     """, unsafe_allow_html=True)
 
     # Simulate loading process
