@@ -11,9 +11,7 @@ def loading_page():
 
     # Embed the external Puzzle game using an iframe
     st.markdown("""
-        <iframe src="https://www.bubbleshooter.net/games/merge-me/" frameborder="0" scrolling="no" width="800" height="600"></iframe>
-
-
+        <iframe src="https://play.famobi.com/1212" width="800" height="600" frameborder="0" scrolling="no"></iframe>
     """, unsafe_allow_html=True)
 
     # Simulate loading process
