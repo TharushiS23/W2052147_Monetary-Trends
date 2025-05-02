@@ -21,9 +21,12 @@ def loading_page():
     # After the loading process, show a message and give the option to go to the dashboard
     st.success("Dashboard is ready!")
 
-    # Give the user the option to go to the main dashboard anytime
-    if st.button("Go to Dashboard"):
-        st.rerun()  # This will reload the page and transition to the main app
+    # Go to Main App button
+    if st.button("Main App"):
+        st.session_state['Main_app'] = True
+        if "Player_pos" in st.session_state:
+            del st.session_state.player_pos
+        st.rerun()
 
 if __name__ == "__main__":
     loading_page()
