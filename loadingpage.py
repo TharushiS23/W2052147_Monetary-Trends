@@ -11,7 +11,8 @@ def loading_page():
 
     # Embed the external Puzzle game using an iframe
     st.markdown("""
-        <iframe src="https://example.com/puzzle-game" width="100%" height="600px"></iframe>
+        <iframe src="https://cdn.bubbleshooter.net/games/zero-squares/" frameborder="0" scrolling="no" width="800" height="600"></iframe>
+
     """, unsafe_allow_html=True)
 
     # Simulate loading process
