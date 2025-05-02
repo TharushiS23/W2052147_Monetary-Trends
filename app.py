@@ -27,20 +27,34 @@ st.markdown('<style>div.block-container{padding-top:1rem;}</style>', unsafe_allo
 df = load_data()
 df['Date'] = df['Date'].dt.date
 
-#Setting a background
 st.markdown(
-"""
+    """
     <style>
-    .stApp {
-        background-image: url("C:/Users/tharu/OneDrive/Documents/IIT/IIT-second year/Second sem/Project lifecycle/Courseworks-DSPL/W2052147_Monetary-Trends/MOF image.jpg");
+    .full-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: url('https://w0.peakpx.com/wallpaper/10/708/HD-wallpaper-money-dollar-coin-gold-money-gold-coin-dollar.jpg') no-repeat center center fixed;
         background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
+        padding: 0;
+        margin: 0;
+    }
+
+    .main-box {
+        width: 80%;
+        height: 90%;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 10px;
+        padding: 20px;
+        overflow: auto;
     }
     </style>
-    """, unsafe_allow_html=True
+    """,
+    unsafe_allow_html=True
 )
+
 
 # Common header for all dashboards
 def display_header():
