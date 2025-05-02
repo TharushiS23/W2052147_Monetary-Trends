@@ -4,45 +4,24 @@ import datetime
 from PIL import Image
 import plotly.graph_objects as go
 import numpy as np
-import plotly.express as px
 from plotly.subplots import make_subplots
+import plotly.express as px
 
 # Load the dataset
 @st.cache_data
 def load_data():
- 
     df = pd.read_csv("Monetary_stats_1995-2025.csv")
     # Ensure that the 'Date' column is in datetime format and remove the time part
     df['Date'] = pd.to_datetime(df['Date'], errors='coerce').dt.normalize()
     # Extract year and use it for the filter
     df['Year'] = df['Date'].dt.year
-    df['Total'] = df["Broad Money (M2b) \n(d)            \n (3) + (4)"]
+    # Calculate the total for M1, M2, and M2b by adding the three columns
+    df['Total'] = df["Narrow Money (M1) \n(c)    \n (1) + (2)"] + df["Broad Money (M2) (b)"] + df["Broad Money (M2b) \n(d)            \n (3) + (4)"]
     return df
 
 # Set Streamlit page config and styling
 st.set_page_config(layout="wide")
-
-# Add custom CSS for background image and main container box
-st.markdown("""
-    <style>
-    .stApp {
-        background-image: url("https://w0.peakpx.com/wallpaper/10/708/HD-wallpaper-money-dollar-coin-gold-money-gold-coin-dollar.jpg");
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
-    }
-    
-    .main-container {
-        background-color: rgba(255, 255, 255, 0.85);
-        padding: 20px;
-        border-radius: 10px;
-        margin: 10px;
-    }
-    </style>
-""", unsafe_allow_html=True)
-
-# Start of main container
-st.markdown('<div class="main-container">', unsafe_allow_html=True)
+st.markdown('<style>div.block-container{padding-top:1rem;}</style>', unsafe_allow_html=True)
 
 # Load data
 df = load_data()
