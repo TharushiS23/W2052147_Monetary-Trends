@@ -585,4 +585,4 @@ with tab5:
     st.plotly_chart(fig11, use_container_width=True)
 
 if __name__ == "__main__":
-    run_dashboard()
+    main()
