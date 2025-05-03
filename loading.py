@@ -1,14 +1,6 @@
 import streamlit as st
 import os
 from streamlit.components.v1 import html
-import time
-
-# Page config
-st.set_page_config(
-    page_title="Loading Page",
-    page_icon="⌛",
-    layout="wide"
-)
 
 # Custom CSS to style the page
 st.markdown("""
@@ -78,15 +70,9 @@ def main():
     
     # Button to open main app
     if st.button('Launch Main Dashboard'):
-        # Use session state to indicate we should load the main app content
+        # Set the flag to show the main dashboard
         st.session_state.show_main_dashboard = True
         st.rerun()
-    
-    # Check if we should show the main dashboard
-    if 'show_main_dashboard' in st.session_state and st.session_state.show_main_dashboard:
-        # Import and run the main app code
-        import app
-        app.main()
 
 if __name__ == "__main__":
     main()
