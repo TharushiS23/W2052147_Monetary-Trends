@@ -1,6 +1,5 @@
 import streamlit as st
 import os
-import webbrowser
 from streamlit.components.v1 import html
 import time
 
@@ -79,20 +78,15 @@ def main():
     
     # Button to open main app
     if st.button('Launch Main Dashboard'):
-        # Set a flag in session_state to indicate we should redirect
-        st.session_state.redirect_to_main = True
+        # Use session state to indicate we should load the main app content
+        st.session_state.show_main_dashboard = True
         st.rerun()
     
-    # Check if we should redirect
-    if 'redirect_to_main' in st.session_state and st.session_state.redirect_to_main:
-        # Clear the flag
-        st.session_state.redirect_to_main = False
-        # Redirect to main app
-        html("""
-            <script>
-                window.location.href = "./app";
-            </script>
-        """)
+    # Check if we should show the main dashboard
+    if 'show_main_dashboard' in st.session_state and st.session_state.show_main_dashboard:
+        # Import and run the main app code
+        import app
+        app.main()
 
 if __name__ == "__main__":
     main()
