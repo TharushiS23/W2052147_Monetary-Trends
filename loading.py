@@ -81,7 +81,7 @@ def main():
     if st.button('Launch Main Dashboard'):
         # Set a flag in session_state to indicate we should redirect
         st.session_state.redirect_to_main = True
-        st.experimental_rerun()
+        st.rerun()
     
     # Check if we should redirect
     if 'redirect_to_main' in st.session_state and st.session_state.redirect_to_main:
