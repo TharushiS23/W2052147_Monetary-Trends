@@ -53,6 +53,7 @@ def display_sidebar_filters(df):
     quarter_filter = st.sidebar.selectbox("Select Quarter", ['All', 'Q1', 'Q2', 'Q3', 'Q4'])
     month_filter = st.sidebar.selectbox("Select Month", ['All'] + list(df['Month_Name'].unique()))
 
+    # Apply filters
     if year_filter != 'All':
         df = df[df['Year'] == year_filter]
     if quarter_filter != 'All':
