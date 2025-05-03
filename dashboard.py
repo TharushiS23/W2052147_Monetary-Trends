@@ -14,10 +14,16 @@ st.set_page_config(
 )
 st.markdown('<style>div.block-container{padding-top:1rem;}</style>', unsafe_allow_html=True)
 
-progress = st.progress(0)
-for i in range(100):
-    time.sleep(0.01)
-    progress.progress(i + 1)
+def show_loading_bar():
+    with st.spinner("Loading, please wait..."):
+        progress = st.progress(0)
+        for i in range(100):
+            time.sleep(0.01)
+            progress.progress(i + 1)
+        time.sleep(0.2)  # slight pause so it doesn't disappear instantly
+
+# ✅ Call the loading bar function AFTER initial page load
+show_loading_bar()
 
 # Load dataset
 @st.cache_data
