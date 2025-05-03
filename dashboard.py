@@ -37,26 +37,10 @@ def show_loading_game():
 
     if st.button("Launch Main App"):
         st.session_state['current_page'] = 'dashboard'
-        st.experimental_rerun()
+        st.rerun()
 
-st.markdown('<style>div.block-container{padding-top:1rem;}</style>', unsafe_allow_html=True)
-
-if __name__ == "__main__":
-    # Check which page to display based on session state
-    if st.session_state['current_page'] == 'loading':
-        # Show loading game (Sudoku)
-        show_loading_game()
-    else:
-        @st.cache_data
-        def main():
-            df = pd.read_csv("Monetary_stats_1995-2025.csv")
-            df['Date'] = pd.to_datetime(df['Date'], errors='coerce').dt.normalize()
-            df['Year'] = df['Date'].dt.year
-            df['Total'] = df["Broad Money (M2b) \n(d)            \n (3) + (4)"]
-            return df
-
-        # Header section (shows logo and title)
-        def display_header():
+#defining the displaye header functions
+def display_header():
             image = Image.open('MOF image.jpg')
             col1, col2 = st.columns([0.1, 0.9])
             with col1:
@@ -72,8 +56,8 @@ if __name__ == "__main__":
             </style>
             <center><h1 class="title-test">Monetary trends 1995-2025</h1></center>
         """, unsafe_allow_html=True)
-    col1, col2, col3 = st.columns([0.2, 0.8, 0.1])
-    with col3:
+col1, col2, col3 = st.columns([0.2, 0.8, 0.1])
+with col3:
         date_str = datetime.datetime.now().strftime("%d %B %Y")
         st.write(f"Last updated by: Tharushi Seneviratne  \n {date_str}")
 
@@ -100,28 +84,43 @@ def display_sidebar_filters(df):
 
     return df
 
-# Run the app
-df = main()
-df['Date'] = df['Date'].dt.date
+@st.cache_data
+def main():
+        df = pd.read_csv("Monetary_stats_1995-2025.csv")
+        df['Date'] = pd.to_datetime(df['Date'], errors='coerce').dt.normalize()
+        df['Year'] = df['Date'].dt.year
+        df['Total'] = df["Broad Money (M2b) \n(d)            \n (3) + (4)"]
+        return df
 
-# Show header once, at the top
-display_header()
+st.markdown('<style>div.block-container{padding-top:1rem;}</style>', unsafe_allow_html=True)
 
-# Tabs (rendered correctly)
-tab1, tab2, tab3, tab4, tab5 = st.tabs([
+
+if __name__ == "__main__":
+    # Check which page to display based on session state
+    if st.session_state['current_page'] == 'loading':
+        # Show loading game (Sudoku)
+        show_loading_game()
+    else:
+        df = main()
+        df['Date'] = df['Date'].dt.date
+
+    #display header
+    display_header()
+
+    # Tabs (rendered correctly)
+    tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "Money Supply Overview", 
     "Credit Availability Trends", 
     "Economic Liquidity Indicators", 
     "Relationship Explorer", 
     "Key Insights & Highlights"
-])
+    ])
 
-# Sidebar filters applied after tab setup
-filtered_df = display_sidebar_filters(df)
+    filtered_df = display_sidebar_filters(df)
 
-# DASHBOARD 1: MONEY SUPPLY OVERVIEW
-with tab1:
-    st.header("Overview of Money Supply Components")
+    # DASHBOARD 1: MONEY SUPPLY OVERVIEW
+    with tab1:
+        st.header("Overview of Money Supply Components")
 
     col1, col2 = st.columns(2)
 
@@ -201,10 +200,10 @@ with tab1:
     with st.expander("View Raw Data"):
         st.write(filtered_df[["Date", "Narrow Money (M1) \n(c)    \n (1) + (2)", "Broad Money (M2) (b)", "Broad Money (M2b) \n(d)            \n (3) + (4)"]])
         st.download_button("Download Data", filtered_df.to_csv().encode("utf-8"), "money_supply_data.csv", "text/csv")
-
-# DASHBOARD 2: CREDIT AVAILABILITY TRENDS
-with tab2:
-    st.header("Credit Availability Trends")
+        
+        # DASHBOARD 2: CREDIT AVAILABILITY TRENDS
+        with tab2:
+            st.header("Credit Availability Trends")
 
     col1, col2 = st.columns(2)
     with col1:
@@ -301,16 +300,15 @@ with tab2:
     # Display in Streamlit
     st.subheader("Correlation Matrix: Credit Variables vs Money Supply")
     st.plotly_chart(fig6, use_container_width=True)
-
-# DASHBOARD 3: ECONOMIC LIQUIDITY INDICATORS
-with tab3:
-
-    st.header("Economic Liquidity Indicators")
-
-    # Bubble Chart: Liquidity Measures vs Foreign Assets
-    filtered_df['Month'] = pd.to_datetime(filtered_df['Date']).dt.strftime('%B')
-
-    fig7 = px.scatter(
+    
+    # DASHBOARD 3: ECONOMIC LIQUIDITY INDICATORS
+    with tab3:
+        st.header("Economic Liquidity Indicators")
+        
+        # Bubble Chart: Liquidity Measures vs Foreign Assets
+        filtered_df['Month'] = pd.to_datetime(filtered_df['Date']).dt.strftime('%B')
+        
+        fig7 = px.scatter(
         filtered_df,
         x="Broad Money (M2b) \n(d)            \n (3) + (4)",  
         y="Net Foreign Assets of Monetary Authorities (e)",
@@ -387,12 +385,12 @@ with tab3:
     # Display the Sunburst chart
     st.plotly_chart(fig, use_container_width=True)
 
-# DASHBOARD 4: RELATIONSHIP EXPLORER
-with tab4:
-    st.header("Relationship Explorer")
-
-    # Variables for selection
-    available_variables = [
+    # DASHBOARD 4: RELATIONSHIP EXPLORER
+    with tab4:
+        st.header("Relationship Explorer")
+        
+        # Variables for selection
+        available_variables = [
         "Reserve Money (M0)  (a)", 
         "Broad Money (M2) (b)", 
         "Currency held by the Public",
@@ -414,7 +412,7 @@ with tab4:
     ]
 
     col1, col2 = st.columns(2)
-
+    
     with col1:
         x_variable = st.selectbox("Select X-Axis Variable:", available_variables, index=0)
 
@@ -492,10 +490,10 @@ with tab4:
         st.write("There is a moderate negative correlation between the selected variables.")
     else:
         st.write("There is a strong negative correlation between the selected variables.")
-
-# DASHBOARD 5: KEY INSIGHTS & HIGHLIGHTS
-with tab5:
-    st.header("Key Insights & Highlights")
+        
+        # DASHBOARD 5: KEY INSIGHTS & HIGHLIGHTS
+        with tab5:
+            st.header("Key Insights & Highlights")
 
     # KPI cards
     col1, col2, col3 = st.columns(3)
