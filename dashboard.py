@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import datetime
+import time
 from PIL import Image
 import plotly.graph_objects as go
 import numpy as np
@@ -12,6 +13,11 @@ st.set_page_config(
     layout="wide" 
 )
 st.markdown('<style>div.block-container{padding-top:1rem;}</style>', unsafe_allow_html=True)
+
+progress = st.progress(0)
+for i in range(100):
+    time.sleep(0.01)
+    progress.progress(i + 1)
 
 # Load dataset
 @st.cache_data
