@@ -1,10 +1,13 @@
 import streamlit as st
 import os
-import sys
 
-# Main entry point that defaults to loading page
+# Initialize session state
+if 'show_main_dashboard' not in st.session_state:
+    st.session_state.show_main_dashboard = False
+
+# Main entry point
 def main():
-    # By default, show the loading page
+    # Import loading page first
     import loading
     loading.main()
 
