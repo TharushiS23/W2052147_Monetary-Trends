@@ -18,13 +18,13 @@ st.markdown("""
 <style>
 @keyframes border-runner {
   0%   { top: 0; left: 0; }
-  25%  { top: 0; left: 95%; }
-  50%  { top: 95%; left: 95%; }
-  75%  { top: 95%; left: 0; }
+  25%  { top: 0; left: 100%; }
+  50%  { top: 100%; left: 100%; }
+  75%  { top: 100%; left: 0; }
   100% { top: 0; left: 0; }
 }
 
-.block-container {
+div.block-container {
     position: relative;
     border: 4px solid #1E88E5;
     border-radius: 10px;
@@ -32,19 +32,19 @@ st.markdown("""
     margin: 10px;
 }
 
-.runner {
-    width: 10px;
-    height: 10px;
+div.runner {
+    width: 12px;
+    height: 12px;
     background-color: red;
     border-radius: 50%;
     position: absolute;
     animation: border-runner 4s linear infinite;
+    z-index: 999;
+    box-shadow: 0 0 10px 4px rgba(255, 0, 0, 0.6);  /* Glowing effect */
 }
 </style>
 
-<div class="block-container">
-    <div class="runner"></div>
-</div>
+<div class="runner"></div>
 """, unsafe_allow_html=True)
 
 
