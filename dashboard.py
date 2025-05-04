@@ -42,28 +42,31 @@ div.block-container::before {
 </style>
 """, unsafe_allow_html=True)
 
-##loading test game start
-import streamlit as st
-import streamlit.components.v1 as components
-import time
+# Show loading bar only once
+def show_loading_bar():
+    loading_messages = [
+        "🔍 Analyzing data structure...",
+        "📊 Loading visual components...",
+        "🧠 Applying statistical models...",
+        "🎯 Finalizing dashboard..."
+    ]
+    emoji_frames = ["⏳", "🕐", "🕓", "🕘", "⌛"]
 
-def show_loading_game():
-    with st.empty():
-        components.html(
-            """
-            <div style="display: flex; justify-content: center; align-items: center; height: 100vh;">
-                <iframe src="https://www.free-sudoku.com/sudoku-webmaster.php" width="800" height="600" frameborder="0" style="border: none;"></iframe>
-            </div>
-            """,
-            height=600
-        )
-        time.sleep(6)  # how long to show the game before proceeding
+    with st.spinner("🚀 Starting up..."):
+        progress = st.progress(0, text="Starting...")
+        for i in range(100):
+            time.sleep(0.03)
+            stage = i // 25
+            message = loading_messages[min(stage, len(loading_messages)-1)]
+            emoji = emoji_frames[i % len(emoji_frames)]
+            progress.progress(i + 1, text=f"{emoji} {message} ({i+1}%)")
+        time.sleep(0.5)  # pause for effect
 
+# Use session state to avoid showing loading bar every time
 if "loaded" not in st.session_state:
-    show_loading_game()
+    show_loading_bar()
     st.session_state.loaded = True
-    st.rerun()
-#loading test game- finish
+    st.rerun() 
 
 
 # Load dataset
