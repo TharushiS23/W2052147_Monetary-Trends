@@ -12,21 +12,19 @@ from plotly.subplots import make_subplots
 st.set_page_config(
     layout="wide" 
 )
-st.markdown('<style>div.block-container{padding-top:1rem;}</style>', unsafe_allow_html=True)
 
 #adding a boarder to the dashboard
 st.markdown("""
 <style>
-    .main-dashboard-container {
+    .block-container {
         border: 2px solid #1E88E5;
         border-radius: 10px;
         padding: 20px;
-        margin: 10px 0px;
+        margin: 10px;
     }
 </style>
 """, unsafe_allow_html=True)
-
-st.markdown('<div class="main-dashboard-container">', unsafe_allow_html=True)
+st.markdown('<style>div.block-container{padding-top:1rem;}</style>', unsafe_allow_html=True)
 
 #show loading bar 
 def show_loading_bar():
@@ -609,5 +607,3 @@ with tab5:
 
 if __name__ == "__main__":
     main()
-
-st.markdown('</div>', unsafe_allow_html=True)
