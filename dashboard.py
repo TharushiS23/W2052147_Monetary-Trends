@@ -89,7 +89,6 @@ def display_header():
     image = Image.open('cbsl_logo.png')
     col1, col2 = st.columns([0.1, 0.9])
     with col1:
-        st.markdown("<br><br>", unsafe_allow_html=True) 
         st.image(image, width=100)
     with col2:
         st.markdown("""
