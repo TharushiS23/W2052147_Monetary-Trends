@@ -26,7 +26,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 st.markdown('<style>div.block-container{padding-top:1rem;}</style>', unsafe_allow_html=True)
 
-#show loading bar 
+# Show loading bar only once
 def show_loading_bar():
     loading_messages = [
         "🔍 Analyzing data structure...",
@@ -40,15 +40,17 @@ def show_loading_bar():
         progress = st.progress(0, text="Starting...")
         for i in range(100):
             time.sleep(0.03)
-            # Change message every 25%
             stage = i // 25
             message = loading_messages[min(stage, len(loading_messages)-1)]
             emoji = emoji_frames[i % len(emoji_frames)]
             progress.progress(i + 1, text=f"{emoji} {message} ({i+1}%)")
         time.sleep(0.5)  # pause for effect
 
-# ✅ Call it after initial load
-show_loading_bar()
+# Use session state to avoid showing loading bar every time
+if "loaded" not in st.session_state:
+    show_loading_bar()
+    st.session_state.loaded = True
+    st.rerun() 
 
 # Load dataset
 @st.cache_data
