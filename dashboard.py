@@ -10,7 +10,8 @@ from plotly.subplots import make_subplots
 
 # Page config
 st.set_page_config(
-    layout="wide" 
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
 # Adding a boarder
@@ -26,7 +27,12 @@ st.markdown("""
 
 div.block-container {
     position: relative;
+    border: 2px solid #39FF14;  /* Add a solid green border */
+    border-radius: 8px;         /* Optional: rounded corners */
+    padding: 10px;              /* Add some padding inside the border */
+    box-shadow: 0 0 15px rgba(57, 255, 20, 0.3); /* Optional: add a glow effect */
 }
+
 
 div.block-container::before {
     content: "";
