@@ -80,7 +80,7 @@ def main():
 
 # Header section (shows logo and title)
 def display_header():
-    image = Image.open('MOF image.jpg')
+    image = Image.open('cbsl_logo.png')
     col1, col2 = st.columns([0.1, 0.9])
     with col1:
         st.image(image, width=100)
