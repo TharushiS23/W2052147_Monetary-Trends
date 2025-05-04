@@ -10,7 +10,7 @@ from plotly.subplots import make_subplots
 
 # Page config
 st.set_page_config(
-    layout="wide" 
+    layout="centered" 
 )
 
 #adding a boarder to the dashboard
