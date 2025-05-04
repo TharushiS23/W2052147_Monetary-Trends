@@ -13,38 +13,33 @@ st.set_page_config(
     layout="wide" 
 )
 
-#adding a boarder to the dashboard
+# Adding a boarder
 st.markdown("""
 <style>
 @keyframes border-runner {
   0%   { top: 0; left: 0; }
-  25%  { top: 0; left: 100%; }
-  50%  { top: 100%; left: 100%; }
-  75%  { top: 100%; left: 0; }
+  25%  { top: 0; left: 100%; transform: translateX(-100%); }
+  50%  { top: 100%; left: 100%; transform: translate(-100%, -100%); }
+  75%  { top: 100%; left: 0; transform: translateY(-100%); }
   100% { top: 0; left: 0; }
 }
 
 div.block-container {
     position: relative;
-    border: 4px solid #1E88E5;
-    border-radius: 10px;
-    padding: 20px;
-    margin: 10px;
 }
 
-div.runner {
+div.block-container::before {
+    content: "";
     width: 12px;
     height: 12px;
-    background-color: red;
+    background-color: #39FF14;
     border-radius: 50%;
     position: absolute;
-    animation: border-runner 4s linear infinite;
+    animation: border-runner 12s linear infinite;
+    box-shadow: 0 0 10px 4px rgba(57, 255, 20, 0.6);
     z-index: 999;
-    box-shadow: 0 0 10px 4px rgba(255, 0, 0, 0.6);  /* Glowing effect */
 }
 </style>
-
-<div class="runner"></div>
 """, unsafe_allow_html=True)
 
 
