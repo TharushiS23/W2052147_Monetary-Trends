@@ -16,15 +16,37 @@ st.set_page_config(
 #adding a boarder to the dashboard
 st.markdown("""
 <style>
-    .block-container {
-        border: 2px solid #1E88E5;
-        border-radius: 10px;
-        padding: 20px;
-        margin: 10px;
-    }
+@keyframes border-runner {
+  0%   { top: 0; left: 0; }
+  25%  { top: 0; left: 95%; }
+  50%  { top: 95%; left: 95%; }
+  75%  { top: 95%; left: 0; }
+  100% { top: 0; left: 0; }
+}
+
+.block-container {
+    position: relative;
+    border: 4px solid #1E88E5;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 10px;
+}
+
+.runner {
+    width: 10px;
+    height: 10px;
+    background-color: red;
+    border-radius: 50%;
+    position: absolute;
+    animation: border-runner 4s linear infinite;
+}
 </style>
+
+<div class="block-container">
+    <div class="runner"></div>
+</div>
 """, unsafe_allow_html=True)
-st.markdown('<style>div.block-container{padding-top:1rem;}</style>', unsafe_allow_html=True)
+
 
 # Show loading bar only once
 def show_loading_bar():
