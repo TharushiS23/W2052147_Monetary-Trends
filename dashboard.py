@@ -89,6 +89,7 @@ def display_header():
     image = Image.open('cbsl_logo.png')
     col1, col2 = st.columns([0.1, 0.9])
     with col1:
+        st.markdown("<br><br>", unsafe_allow_html=True) 
         st.image(image, width=100)
     with col2:
         st.markdown("""
@@ -99,7 +100,11 @@ def display_header():
                 border-radius:6px;
             }
             </style>
-            <center><h1 class="title-test">Monetary trends 1995-2025</h1></center>
+            <center>
+                    <br><br>
+                    <h1 class="title-test">Monetary trends 1995-2025</h1></center>
+                    <br><br>
+            <center>
         """, unsafe_allow_html=True)
     col1, col2, col3 = st.columns([0.2, 0.8, 0.1])
     with col3:
