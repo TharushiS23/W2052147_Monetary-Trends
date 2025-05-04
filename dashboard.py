@@ -103,16 +103,33 @@ def display_header():
 # Sidebar filters
 def display_sidebar_filters(df):
     st.sidebar.header("Filter Data")
+    
+    # Ensure the session state is initialized for filters
+    if 'year' not in st.session_state:
+        st.session_state.year = 'All'
+    if 'quarter' not in st.session_state:
+        st.session_state.quarter = 'All'
+    if 'month' not in st.session_state:
+        st.session_state.month = 'All'
+    
     df['Date'] = pd.to_datetime(df['Date'])
     df['Year'] = df['Date'].dt.year
     df['Month_Name'] = df['Date'].dt.month_name()
     df['Quarter'] = df['Date'].dt.quarter
 
-    year_filter = st.sidebar.selectbox("Select Year", ['All'] + sorted(df['Year'].unique().tolist()))
-    quarter_filter = st.sidebar.selectbox("Select Quarter", ['All', 'Q1', 'Q2', 'Q3', 'Q4'])
-    month_filter = st.sidebar.selectbox("Select Month", ['All'] + list(df['Month_Name'].unique()))
+    # Select Year
+    year_filter = st.sidebar.selectbox("Select Year", ['All'] + sorted(df['Year'].unique().tolist()), key='year', index=sorted(df['Year'].unique().tolist()).index(st.session_state.year) if st.session_state.year != 'All' else 0)
+    st.session_state.year = year_filter
 
-    # Apply filters
+    # Select Quarter
+    quarter_filter = st.sidebar.selectbox("Select Quarter", ['All', 'Q1', 'Q2', 'Q3', 'Q4'], key='quarter', index=['All', 'Q1', 'Q2', 'Q3', 'Q4'].index(st.session_state.quarter))
+    st.session_state.quarter = quarter_filter
+
+    # Select Month
+    month_filter = st.sidebar.selectbox("Select Month", ['All'] + list(df['Month_Name'].unique()), key='month', index=['All'] + list(df['Month_Name'].unique()).index(st.session_state.month))
+    st.session_state.month = month_filter
+
+    # Apply filters to the DataFrame based on selections
     if year_filter != 'All':
         df = df[df['Year'] == year_filter]
     if quarter_filter != 'All':
@@ -122,6 +139,7 @@ def display_sidebar_filters(df):
         df = df[df['Month_Name'] == month_filter]
 
     return df
+
 
 # Run the app
 df = main()
@@ -380,7 +398,7 @@ with tab3:
     )
 
     # Display the chart
-    st.plotly_chart(fig8, use_container_width=True)
+    st.plotly_chart(fig8, use_container_width=True) 
 
 # Sunburst Chart: Breakdown of Domestic and Foreign Liquidity
     liquidity_df = filtered_df.copy()
